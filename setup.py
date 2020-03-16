@@ -47,7 +47,9 @@ setup(
         "click",
         "pandas",
         "scipy",
-        "pyprind",
+        "tqdm",
+        "elasticsearch",
+        "pandas",
     ],
 
     extras_require={
