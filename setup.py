@@ -50,6 +50,7 @@ setup(
         "tqdm",
         "elasticsearch",
         "pandas",
+        "numpy",
     ],
 
     extras_require={
