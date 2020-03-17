@@ -3,6 +3,8 @@ import typing
 
 from elasticsearch import Elasticsearch
 import pandas as pd
+import numpy as np
+from loguru import logger
 
 from .message import ProductionEventMessage, EventStatus
 
@@ -36,7 +38,7 @@ class EsMessageStorage(MessageStorage):
             production_name: str = None,
             start_time: datetime.datetime = None,
             forecast_time: str = None,
-            size: int = 100,
+            size: int = 20,
     ) -> typing.Iterable[ProductionEventMessage]:
         conditions = [{
             "match": {"data.system": system}
@@ -57,15 +59,33 @@ class EsMessageStorage(MessageStorage):
                 },
             },
         }
+
+        search_from = 0
+        total = np.iinfo(np.int16).max
+
+        while search_from < total:
+            res = self._get_result(
+                index="2020-03",
+                query_body=query_body,
+                search_from=search_from,
+                search_size=size,
+            )
+
+            total = res['hits']['total']['value']
+            logger.info(f"total: {total}")
+            search_from += len(res['hits']['hits'])
+            for hit in res['hits']['hits']:
+                yield load_message(hit["_source"])
+
+    def _get_result(self, index: str, query_body: dict, search_from: int, search_size: int):
         search_body = {
-            "size": size
+            "size": search_size,
+            "from": search_from,
         }
         search_body.update(**query_body)
         print(search_body)
-        res = self.client.search(index="2020-03", body=search_body)
-        total_value = res['hits']['total']['value']
-        for hit in res['hits']['hits']:
-            yield load_message(hit["_source"])
+        res = self.client.search(index=index, body=search_body)
+        return res
 
 
 def load_message(doc: dict) -> ProductionEventMessage:
