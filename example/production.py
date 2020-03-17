@@ -35,13 +35,14 @@ def cli(elastic_server, system, production_stream, production_type, production_n
     df = pd.DataFrame(columns=["time"])
     for result in results:
         hours = get_hour(result)
-        # logger.info("[{}] forecast hour: {}", result.forecast_time, hours)
         message_time = result.time.ceil("S")
-        current_df = pd.DataFrame({"time": [message_time]}, columns=["time"], index=[get_hour(result)])
+        current_df = pd.DataFrame({"time": [message_time]}, columns=["time"], index=[hours])
         df = df.append(current_df)
+
+    logger.info("Get {} results", len(df))
     df = df.sort_index()
     print(df)
-    print(df.time.max())
+    print(f"Latest time: {df.time.max()}")
 
 
 if __name__ == "__main__":
