@@ -2,6 +2,7 @@ import datetime
 
 import pandas as pd
 import click
+from loguru import logger
 
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool.message import ProductionEventMessage
@@ -33,8 +34,12 @@ def cli(elastic_server, system, production_stream, production_type, production_n
     )
     df = pd.DataFrame(columns=["time"])
     for result in results:
-        current_df = pd.DataFrame({"time": [result.time]}, columns=["time"], index=[get_hour(result)])
+        hours = get_hour(result)
+        # logger.info("[{}] forecast hour: {}", result.forecast_time, hours)
+        message_time = result.time.ceil("S")
+        current_df = pd.DataFrame({"time": [message_time]}, columns=["time"], index=[get_hour(result)])
         df = df.append(current_df)
+    df = df.sort_index()
     print(df)
     print(df.time.max())
 
