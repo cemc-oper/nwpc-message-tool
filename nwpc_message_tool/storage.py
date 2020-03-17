@@ -74,6 +74,7 @@ class EsMessageStorage(MessageStorage):
             total = res['hits']['total']['value']
             logger.info(f"total: {total}")
             search_from += len(res['hits']['hits'])
+            logger.info("result count: {}", len(res["hits"]["hits"]))
             for hit in res['hits']['hits']:
                 yield load_message(hit["_source"])
 
