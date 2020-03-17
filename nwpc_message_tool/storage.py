@@ -19,8 +19,8 @@ class MessageStorage(object):
             production_name,
             start_time,
             forecast_time,
-    ):
-        pass
+    ) -> typing.Iterable[ProductionEventMessage]:
+        raise NotImplemented()
 
 
 class EsMessageStorage(MessageStorage):
@@ -30,14 +30,14 @@ class EsMessageStorage(MessageStorage):
 
     def get_production_messages(
             self,
-            system,
+            system: str,
             production_type: str = None,
             production_stream: str = None,
             production_name: str = None,
             start_time: datetime.datetime = None,
             forecast_time: str = None,
             size: int = 100,
-    ) -> typing.List[ProductionEventMessage]:
+    ) -> typing.Iterable[ProductionEventMessage]:
         conditions = [{
             "match": {"data.system": system}
         }]
@@ -64,10 +64,8 @@ class EsMessageStorage(MessageStorage):
         print(search_body)
         res = self.client.search(index="2020-03", body=search_body)
         total_value = res['hits']['total']['value']
-        messages = []
         for hit in res['hits']['hits']:
-            messages.append(load_message(hit["_source"]))
-        return messages
+            yield load_message(hit["_source"])
 
 
 def load_message(doc: dict) -> ProductionEventMessage:

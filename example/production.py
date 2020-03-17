@@ -31,7 +31,6 @@ def cli(elastic_server, system, production_stream, production_type, production_n
         production_name=production_name,
         start_time=start_time
     )
-    print(f"return results: {len(results)}")
     df = pd.DataFrame(columns=["time"])
     for result in results:
         current_df = pd.DataFrame({"time": [result.time]}, columns=["time"], index=[get_hour(result)])
