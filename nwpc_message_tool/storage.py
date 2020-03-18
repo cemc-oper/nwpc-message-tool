@@ -37,7 +37,7 @@ class EsMessageStorage(MessageStorage):
             production_type: str = None,
             production_stream: str = None,
             production_name: str = None,
-            start_time: datetime.datetime or typing.Tuple = None,
+            start_time: datetime.datetime or typing.Tuple or typing.List = None,
             forecast_time: str = None,
             size: int = 20,
     ) -> typing.Iterable[ProductionEventMessage]:

@@ -27,10 +27,12 @@ def load_message(doc: dict) -> ProductionEventMessage:
     return message
 
 
-def get_index(start_time: datetime.datetime or typing.Tuple = None) -> typing.List[str]:
+def get_index(start_time: datetime.datetime or typing.Tuple or typing.List = None) -> typing.List[str]:
     if isinstance(start_time, typing.Tuple):
         time_series = pd.date_range(start=pd.Timestamp(start_time[0]), end=pd.Timestamp(start_time[1]), freq="D")
         return [h.strftime("%Y-%m") for h in time_series]
+    elif isinstance(start_time, typing.List):
+        return [h.strftime("%Y-%m") for h in start_time]
     return [start_time.strftime("%Y-%m")]
 
 
@@ -39,7 +41,7 @@ def get_production_query_body(
         production_type: str = None,
         production_stream: str = None,
         production_name: str = None,
-        start_time: datetime.datetime or typing.Tuple = None,
+        start_time: datetime.datetime or typing.Tuple or typing.List = None,
         forecast_time: str = None,
 ) -> dict:
     conditions = [{
@@ -60,6 +62,12 @@ def get_production_query_body(
                     "gte": start_time[0].isoformat(),
                     "lte": start_time[1].isoformat(),
                 }
+            }
+        })
+    elif isinstance(start_time, typing.List):
+        conditions.append({
+            "terms": {
+                "data.start_time": [s.isoformat() for s in start_time]
             }
         })
 
