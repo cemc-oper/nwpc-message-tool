@@ -1,11 +1,10 @@
 import typing
-
-from nwpc_message_tool.message import ProductionEventMessage
+import pandas as pd
 
 
 class Presenter(object):
     def __init__(self):
         pass
 
-    def process_messages(self, messages: typing.Iterable[ProductionEventMessage]):
+    def show(self, df: pd.DataFrame):
         pass

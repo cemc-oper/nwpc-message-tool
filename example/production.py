@@ -6,6 +6,7 @@ from loguru import logger
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool import nmc_monitor, nwpc_message
 from nwpc_message_tool.presenter import PrintPresenter
+from nwpc_message_tool.processor import TableProcessor
 
 
 @click.command()
@@ -46,8 +47,11 @@ def cli(elastic_server, system, production_stream, production_type, production_n
         start_time=start_time
     )
 
+    processor = TableProcessor()
+    table = processor.process_messages(results)
+
     presenter = PrintPresenter()
-    presenter.process_messages(results)
+    presenter.show(table)
 
 
 if __name__ == "__main__":
