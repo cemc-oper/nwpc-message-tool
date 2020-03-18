@@ -2,11 +2,11 @@ import datetime
 import typing
 
 from elasticsearch import Elasticsearch
-import pandas as pd
 import numpy as np
 from loguru import logger
 
-from .message import ProductionEventMessage, EventStatus
+from nwpc_message_tool.message import ProductionEventMessage
+from nwpc_message_tool.nwpc_message import load_message
 
 
 class MessageStorage(object):
@@ -89,20 +89,3 @@ class EsMessageStorage(MessageStorage):
         print(search_body)
         res = self.client.search(index=index, body=search_body)
         return res
-
-
-def load_message(doc: dict) -> ProductionEventMessage:
-    data = doc["data"]
-    message = ProductionEventMessage(
-        message_type=doc["type"],
-        time=pd.Timestamp(doc["time"]),
-        system=data["system"],
-        stream=data["stream"],
-        production_type=data["type"],
-        production_name=data["name"],
-        event=data["event"],
-        status=EventStatus(data["status"]),
-        start_time=pd.Timestamp(data["start_time"]),
-        forecast_time=pd.Timedelta(data["forecast_time"]),
-    )
-    return message
