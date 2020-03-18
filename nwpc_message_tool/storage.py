@@ -63,9 +63,11 @@ class EsMessageStorage(MessageStorage):
         search_from = 0
         total = np.iinfo(np.int16).max
 
+        index = start_time.strftime("%Y-%m")
+
         while search_from < total:
             res = self._get_result(
-                index="2020-03",
+                index=index,
                 query_body=query_body,
                 search_from=search_from,
                 search_size=size,
