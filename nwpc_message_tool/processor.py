@@ -26,6 +26,9 @@ class TableProcessor(object):
                 index=[f"{result.start_time.strftime('%Y%m%d%H')}+{hours:03}"]
             )
             df = df.append(current_df)
+        df["time"] = pd.to_datetime(df["time"])
+        df["forecast_hour"] = pd.to_numeric(df["forecast_hour"])
+        df["start_time"] = df["start_time"].astype(str)
         logger.info(f"searching...done")
 
         logger.info(f"get {len(df)} results")
