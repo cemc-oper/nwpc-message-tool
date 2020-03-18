@@ -40,21 +40,21 @@ def get_production_query_body(
         forecast_time: str = None,
 ) -> dict:
     conditions = [{
-        "match": {"data.system": system}
+        "term": {"data.system": system}
     }]
     if production_type is not None:
-        conditions.append({"match": {"data.type": production_type}})
+        conditions.append({"term": {"data.type": production_type}})
     if production_stream is not None:
-        conditions.append({"match": {"data.stream": production_stream}})
+        conditions.append({"term": {"data.stream": production_stream}})
     if production_name is not None:
-        conditions.append({"match": {"data.name": production_name}})
+        conditions.append({"term": {"data.name": production_name}})
     if start_time is not None:
-        conditions.append({"match": {"data.start_time": start_time.isoformat()}})
+        conditions.append({"term": {"data.start_time": start_time.isoformat()}})
 
     query_body = {
         "query": {
             "bool": {
-                "must": conditions
+                "filter": conditions
             },
         },
     }

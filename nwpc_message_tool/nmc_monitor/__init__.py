@@ -50,15 +50,15 @@ def get_production_query_body(
         **kwargs
 ) -> dict:
     conditions = [{
-        "match": {"source": system}
+        "term": {"source": system}
     }]
     if start_time is not None:
-        conditions.append({"match": {"startTime": start_time.isoformat()}})
+        conditions.append({"term": {"startTime": start_time.isoformat()}})
 
     query_body = {
         "query": {
             "bool": {
-                "must": conditions
+                "filter": conditions
             },
         },
     }
