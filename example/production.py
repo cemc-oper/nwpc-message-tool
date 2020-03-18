@@ -29,9 +29,12 @@ def cli(elastic_server, system, production_stream, production_type, production_n
         engine = nmc_monitor
     else:
         raise NotImplemented(f"engine is not supported: {engine}")
+    logger.info(f"using search engine: {engine.__name__}")
 
     system = engine.fix_system_name(system)
+    logger.info(f"fix system name to: {system}")
 
+    logger.info(f"searching...")
     client = EsMessageStorage(
         hosts=elastic_server,
         engine=engine,
@@ -43,14 +46,16 @@ def cli(elastic_server, system, production_stream, production_type, production_n
         production_name=production_name,
         start_time=start_time
     )
+
     df = pd.DataFrame(columns=["time"])
     for result in results:
         hours = get_hour(result)
         message_time = result.time.ceil("S")
         current_df = pd.DataFrame({"time": [message_time]}, columns=["time"], index=[hours])
         df = df.append(current_df)
+    logger.info(f"searching...done")
 
-    logger.info("Get {} results", len(df))
+    logger.info(f"get {len(df)} results")
     df = df.sort_index()
     print(df)
     print(f"Latest time: {df.time.max()}")

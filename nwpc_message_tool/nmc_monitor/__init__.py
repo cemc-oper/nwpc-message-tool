@@ -42,11 +42,12 @@ def get_index(start_time: datetime.datetime = None) -> typing.List[str]:
 
 def get_production_query_body(
         system: str,
-        production_type: str = None,
-        production_stream: str = None,
-        production_name: str = None,
         start_time: datetime.datetime = None,
-        forecast_time: str = None,
+        # production_type: str = None,
+        # production_stream: str = None,
+        # production_name: str = None,
+        # forecast_time: str = None,
+        **kwargs
 ) -> dict:
     conditions = [{
         "match": {"source": system}

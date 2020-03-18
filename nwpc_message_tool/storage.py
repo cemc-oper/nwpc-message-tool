@@ -71,11 +71,12 @@ class EsMessageStorage(MessageStorage):
                     yield self._engine.load_message(hit["_source"])
 
     def _get_result(self, index: str, query_body: dict, search_from: int, search_size: int):
+        logger.info(f"searching from {search_from} with size {search_size}...")
         search_body = {
             "size": search_size,
             "from": search_from,
         }
         search_body.update(**query_body)
-        print(search_body)
+        logger.debug(f"search body: {search_body}")
         res = self.client.search(index=index, body=search_body)
         return res
