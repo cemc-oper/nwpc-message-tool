@@ -19,10 +19,14 @@ def get_hour(message: ProductionEventMessage) -> int:
 @click.option("--production-stream", default="oper", help="stream")
 @click.option("--production-type", default="grib2", help="type")
 @click.option("--production-name", default="orig", help="name")
-@click.option("--start-time", required=True, help="name, YYYYMMDDHH")
+@click.option("--start-time", required=True, help="name, YYYYMMDDHH[/YYYYMMDDHH]")
 @click.option("--engine", default="nwpc_message", type=click.Choice(["nwpc_message", "nmc_monitor"]))
-def cli(elastic_server, system, production_stream, production_type, production_name, start_time, engine):
-    start_time = datetime.datetime.strptime(start_time, "%Y%m%d%H")
+def cli(elastic_server, system, production_stream, production_type, production_name, start_time: str, engine):
+    if "/" in start_time:
+        token = start_time.split("/")
+        start_time = tuple(datetime.datetime.strptime(t, "%Y%m%d%H") for t in token)
+    else:
+        start_time = datetime.datetime.strptime(start_time, "%Y%m%d%H")
     if engine == "nwpc_message":
         engine = nwpc_message
     elif engine == "nmc_monitor":
@@ -47,17 +51,25 @@ def cli(elastic_server, system, production_stream, production_type, production_n
         start_time=start_time
     )
 
-    df = pd.DataFrame(columns=["time"])
+    df = pd.DataFrame(columns=["forecast_hour", "time"])
     for result in results:
         hours = get_hour(result)
         message_time = result.time.ceil("S")
-        current_df = pd.DataFrame({"time": [message_time]}, columns=["time"], index=[hours])
+        current_df = pd.DataFrame(
+            {
+                "forecast_hour": [hours],
+                "time": [message_time]
+            },
+            columns=["forecast_hour", "time"],
+            index=[f"{result.start_time.strftime('%Y%m%d%H')}+{hours:03}"]
+        )
         df = df.append(current_df)
     logger.info(f"searching...done")
 
     logger.info(f"get {len(df)} results")
     df = df.sort_index()
-    print(df)
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(df)
     print(f"Latest time: {df.time.max()}")
 
 
