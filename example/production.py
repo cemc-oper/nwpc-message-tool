@@ -51,16 +51,17 @@ def cli(elastic_server, system, production_stream, production_type, production_n
         start_time=start_time
     )
 
-    df = pd.DataFrame(columns=["forecast_hour", "time"])
+    df = pd.DataFrame(columns=["start_time", "forecast_hour", "time"])
     for result in results:
         hours = get_hour(result)
         message_time = result.time.ceil("S")
         current_df = pd.DataFrame(
             {
+                "start_time": [f"{result.start_time.strftime('%Y%m%d%H')}"],
                 "forecast_hour": [hours],
                 "time": [message_time]
             },
-            columns=["forecast_hour", "time"],
+            columns=["start_time", "forecast_hour", "time"],
             index=[f"{result.start_time.strftime('%Y%m%d%H')}+{hours:03}"]
         )
         df = df.append(current_df)
