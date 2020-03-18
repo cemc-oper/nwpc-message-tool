@@ -5,12 +5,8 @@ import click
 from loguru import logger
 
 from nwpc_message_tool.storage import EsMessageStorage
-from nwpc_message_tool.message import ProductionEventMessage
 from nwpc_message_tool import nmc_monitor, nwpc_message
-
-
-def get_hour(message: ProductionEventMessage) -> int:
-    return int(message.forecast_time.seconds/3600) + message.forecast_time.days * 24
+from nwpc_message_tool.presenter import PrintPresenter
 
 
 @click.command()
@@ -51,27 +47,8 @@ def cli(elastic_server, system, production_stream, production_type, production_n
         start_time=start_time
     )
 
-    df = pd.DataFrame(columns=["start_time", "forecast_hour", "time"])
-    for result in results:
-        hours = get_hour(result)
-        message_time = result.time.ceil("S")
-        current_df = pd.DataFrame(
-            {
-                "start_time": [f"{result.start_time.strftime('%Y%m%d%H')}"],
-                "forecast_hour": [hours],
-                "time": [message_time]
-            },
-            columns=["start_time", "forecast_hour", "time"],
-            index=[f"{result.start_time.strftime('%Y%m%d%H')}+{hours:03}"]
-        )
-        df = df.append(current_df)
-    logger.info(f"searching...done")
-
-    logger.info(f"get {len(df)} results")
-    df = df.sort_index()
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        print(df)
-    print(f"Latest time: {df.time.max()}")
+    presenter = PrintPresenter()
+    presenter.process_messages(results)
 
 
 if __name__ == "__main__":
