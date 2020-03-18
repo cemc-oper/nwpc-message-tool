@@ -1,6 +1,5 @@
 import datetime
 
-import pandas as pd
 import click
 from loguru import logger
 

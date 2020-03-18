@@ -3,15 +3,9 @@ import typing
 import pandas as pd
 from loguru import logger
 
-from .message import ProductionEventMessage
-
-
-class Presenter(object):
-    def __init__(self):
-        pass
-
-    def process_messages(self, messages: typing.Iterable[ProductionEventMessage]):
-        pass
+from nwpc_message_tool.message import ProductionEventMessage
+from nwpc_message_tool.presenter.presenter import Presenter
+from nwpc_message_tool.presenter._util import get_hour
 
 
 class PrintPresenter(Presenter):
@@ -40,7 +34,3 @@ class PrintPresenter(Presenter):
         with pd.option_context('display.max_rows', None, 'display.max_columns', None):
             print(df)
         print(f"Latest time: {df.time.max()}")
-
-
-def get_hour(message: ProductionEventMessage) -> int:
-    return int(message.forecast_time.seconds/3600) + message.forecast_time.days * 24
