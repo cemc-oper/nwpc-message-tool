@@ -6,11 +6,7 @@ import numpy as np
 from loguru import logger
 
 from nwpc_message_tool.message import ProductionEventMessage
-from nwpc_message_tool.nwpc_message import (
-    load_message,
-    get_index,
-    get_production_query_body
-)
+from . import nwpc_message
 
 
 class MessageStorage(object):
@@ -30,9 +26,10 @@ class MessageStorage(object):
 
 
 class EsMessageStorage(MessageStorage):
-    def __init__(self, hosts: list):
+    def __init__(self, hosts: list, engine=nwpc_message):
         super(EsMessageStorage, self).__init__()
         self.client = Elasticsearch(hosts=hosts)
+        self._engine = engine
 
     def get_production_messages(
             self,
@@ -44,7 +41,7 @@ class EsMessageStorage(MessageStorage):
             forecast_time: str = None,
             size: int = 20,
     ) -> typing.Iterable[ProductionEventMessage]:
-        query_body = get_production_query_body(
+        query_body = self._engine.get_production_query_body(
             system=system,
             production_stream=production_stream,
             production_type=production_type,
@@ -56,7 +53,7 @@ class EsMessageStorage(MessageStorage):
         search_from = 0
         total = np.iinfo(np.int16).max
 
-        indexes = get_index(start_time)
+        indexes = self._engine.get_index(start_time)
         for index in indexes:
             while search_from < total:
                 res = self._get_result(
@@ -71,7 +68,7 @@ class EsMessageStorage(MessageStorage):
                 search_from += len(res['hits']['hits'])
                 logger.info("result count: {}", len(res["hits"]["hits"]))
                 for hit in res['hits']['hits']:
-                    yield load_message(hit["_source"])
+                    yield self._engine.load_message(hit["_source"])
 
     def _get_result(self, index: str, query_body: dict, search_from: int, search_size: int):
         search_body = {

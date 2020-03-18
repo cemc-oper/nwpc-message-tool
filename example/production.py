@@ -6,6 +6,7 @@ from loguru import logger
 
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool.message import ProductionEventMessage
+from nwpc_message_tool import nmc_monitor, nwpc_message
 
 
 def get_hour(message: ProductionEventMessage) -> int:
@@ -19,11 +20,21 @@ def get_hour(message: ProductionEventMessage) -> int:
 @click.option("--production-type", default="grib2", help="type")
 @click.option("--production-name", default="orig", help="name")
 @click.option("--start-time", required=True, help="name, YYYYMMDDHH")
-def cli(elastic_server, system, production_stream, production_type, production_name, start_time):
+@click.option("--engine", default="nwpc_message", type=click.Choice(["nwpc_message", "nmc_monitor"]))
+def cli(elastic_server, system, production_stream, production_type, production_name, start_time, engine):
     start_time = datetime.datetime.strptime(start_time, "%Y%m%d%H")
+    if engine == "nwpc_message":
+        engine = nwpc_message
+    elif engine == "nmc_monitor":
+        engine = nmc_monitor
+    else:
+        raise NotImplemented(f"engine is not supported: {engine}")
+
+    system = engine.fix_system_name(system)
 
     client = EsMessageStorage(
         hosts=elastic_server,
+        engine=engine,
     )
     results = client.get_production_messages(
         system=system,
