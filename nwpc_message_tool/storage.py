@@ -4,6 +4,7 @@ import typing
 from elasticsearch import Elasticsearch
 import numpy as np
 from loguru import logger
+import tqdm
 
 from nwpc_message_tool.message import ProductionEventMessage
 from . import nwpc_message
@@ -52,6 +53,7 @@ class EsMessageStorage(MessageStorage):
 
         search_from = 0
         total = np.iinfo(np.int16).max
+        pbar = None
 
         indexes = self._engine.get_index(start_time)
         for index in indexes:
@@ -62,21 +64,28 @@ class EsMessageStorage(MessageStorage):
                     search_from=search_from,
                     search_size=size,
                 )
-
-                total = res['hits']['total']['value']
-                logger.info(f"total: {total}")
+                current_total = res['hits']['total']['value']
+                if current_total < total:
+                    total = current_total
+                    logger.info(f"found results: {total}")
+                    pbar = tqdm.tqdm(total=total)
                 search_from += len(res['hits']['hits'])
-                logger.info("result count: {}", len(res["hits"]["hits"]))
+                current_count = len(res["hits"]["hits"])
+                if pbar is not None:
+                    pbar.update(current_count)
                 for hit in res['hits']['hits']:
                     yield self._engine.load_message(hit["_source"])
 
+        if pbar is not None:
+            pbar.close()
+
     def _get_result(self, index: str, query_body: dict, search_from: int, search_size: int):
-        logger.info(f"searching from {search_from} with size {search_size}...")
+        # logger.debug(f"searching from {search_from} with size {search_size}...")
         search_body = {
             "size": search_size,
             "from": search_from,
         }
         search_body.update(**query_body)
-        logger.debug(f"search body: {search_body}")
+        # logger.debug(f"search body: {search_body}")
         res = self.client.search(index=index, body=search_body)
         return res
