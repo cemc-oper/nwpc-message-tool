@@ -1,3 +1,6 @@
+import datetime
+import typing
+
 import pandas as pd
 
 from nwpc_message_tool.message import ProductionEventMessage, EventStatus
@@ -22,3 +25,31 @@ def load_message(doc: dict) -> ProductionEventMessage:
         forecast_time=pd.Timedelta(f"{doc['forecastTime']}h"),
     )
     return message
+
+
+def get_index(start_time: datetime.datetime = None) -> typing.List[str]:
+    return [start_time.strftime("nmc-prod-%Y-%m")]
+
+
+def get_production_query_body(
+        system: str,
+        production_type: str = None,
+        production_stream: str = None,
+        production_name: str = None,
+        start_time: datetime.datetime = None,
+        forecast_time: str = None,
+) -> dict:
+    conditions = [{
+        "match": {"source": system}
+    }]
+    if start_time is not None:
+        conditions.append({"match": {"startTime": start_time.isoformat()}})
+
+    query_body = {
+        "query": {
+            "bool": {
+                "must": conditions
+            },
+        },
+    }
+    return query_body

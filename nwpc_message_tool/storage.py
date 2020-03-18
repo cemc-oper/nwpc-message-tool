@@ -6,7 +6,11 @@ import numpy as np
 from loguru import logger
 
 from nwpc_message_tool.message import ProductionEventMessage
-from nwpc_message_tool.nwpc_message import load_message
+from nwpc_message_tool.nwpc_message import (
+    load_message,
+    get_index,
+    get_production_query_body
+)
 
 
 class MessageStorage(object):
@@ -40,45 +44,34 @@ class EsMessageStorage(MessageStorage):
             forecast_time: str = None,
             size: int = 20,
     ) -> typing.Iterable[ProductionEventMessage]:
-        conditions = [{
-            "match": {"data.system": system}
-        }]
-        if production_type is not None:
-            conditions.append({"match": {"data.type": production_type}})
-        if production_stream is not None:
-            conditions.append({"match": {"data.stream": production_stream}})
-        if production_name is not None:
-            conditions.append({"match": {"data.name": production_name}})
-        if start_time is not None:
-            conditions.append({"match": {"data.start_time": start_time.isoformat()}})
-
-        query_body = {
-            "query": {
-                "bool": {
-                    "must": conditions
-                },
-            },
-        }
+        query_body = get_production_query_body(
+            system=system,
+            production_stream=production_stream,
+            production_type=production_type,
+            production_name=production_name,
+            start_time=start_time,
+            forecast_time=forecast_time,
+        )
 
         search_from = 0
         total = np.iinfo(np.int16).max
 
-        index = start_time.strftime("%Y-%m")
+        indexes = get_index(start_time)
+        for index in indexes:
+            while search_from < total:
+                res = self._get_result(
+                    index=index,
+                    query_body=query_body,
+                    search_from=search_from,
+                    search_size=size,
+                )
 
-        while search_from < total:
-            res = self._get_result(
-                index=index,
-                query_body=query_body,
-                search_from=search_from,
-                search_size=size,
-            )
-
-            total = res['hits']['total']['value']
-            logger.info(f"total: {total}")
-            search_from += len(res['hits']['hits'])
-            logger.info("result count: {}", len(res["hits"]["hits"]))
-            for hit in res['hits']['hits']:
-                yield load_message(hit["_source"])
+                total = res['hits']['total']['value']
+                logger.info(f"total: {total}")
+                search_from += len(res['hits']['hits'])
+                logger.info("result count: {}", len(res["hits"]["hits"]))
+                for hit in res['hits']['hits']:
+                    yield load_message(hit["_source"])
 
     def _get_result(self, index: str, query_body: dict, search_from: int, search_size: int):
         search_body = {
