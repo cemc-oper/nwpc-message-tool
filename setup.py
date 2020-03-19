@@ -51,6 +51,8 @@ setup(
         "elasticsearch",
         "pandas",
         "numpy",
+        "bokeh",
+        "colorcet",
     ],
 
     extras_require={
