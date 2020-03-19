@@ -3,8 +3,8 @@ import typing
 import pandas as pd
 from loguru import logger
 
-from nwpc_message_tool.message import ProductionEventMessage
 from nwpc_message_tool._util import get_hour
+from nwpc_message_tool.message import ProductionEventMessage
 
 
 class TableProcessor(object):
