@@ -18,7 +18,7 @@ class TableProcessor(object):
             message_time = result.time.ceil("S")
             current_df = pd.DataFrame(
                 {
-                    "start_time": [f"{result.start_time.strftime('%Y%m%d%H')}"],
+                    "start_time": [pd.to_datetime(result.start_time)],
                     "forecast_hour": [hours],
                     "time": [message_time]
                 },
@@ -26,9 +26,9 @@ class TableProcessor(object):
                 index=[f"{result.start_time.strftime('%Y%m%d%H')}+{hours:03}"]
             )
             df = df.append(current_df)
-        df["time"] = pd.to_datetime(df["time"])
+        df["time"] = pd.to_datetime(df["time"], utc=True)
         df["forecast_hour"] = pd.to_numeric(df["forecast_hour"])
-        df["start_time"] = df["start_time"].astype(str)
+        df["start_time"] = pd.to_datetime(df["start_time"], utc=True)
         logger.info(f"searching...done")
 
         logger.info(f"get {len(df)} results")
