@@ -17,7 +17,11 @@ from nwpc_message_tool.processor import TableProcessor
 @click.option("--production-stream", default="oper", help="production stream, such as oper.")
 @click.option("--production-type", default="grib2", help="production type, such as grib.")
 @click.option("--production-name", default="orig", help="production name, such as orig.")
-@click.option("--start-time", required=True, help="start time, one date or a data range, YYYYMMDDHH[/YYYYMMDDHH].")
+@click.option(
+    "--start-time",
+    required=True,
+    metavar="YYYYMMDDHH[/YYYYMMDDHH]",
+    help="start time, one date or a data range.")
 @click.option(
     "--engine",
     default="nwpc_message",
@@ -46,7 +50,7 @@ def table_cli(
         output_file,
 ):
     """
-    Show messages as a table.
+    Show messages as a table or write them into text files with --output-type and --output-file options.
     """
     start_time = parse_start_time(start_time)
 
