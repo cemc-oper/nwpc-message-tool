@@ -21,8 +21,13 @@ from nwpc_message_tool.processor import TableProcessor
 @click.option(
     "--start-time",
     required=True,
-    metavar="YYYYMMDDHH[/YYYYMMDDHH]",
-    help="start time, one date or a data range.")
+    metavar="YYYYMMDDHH[[/YYYYMMDDHH]|[,YYYYMMDDHH,...]]",
+    help="start time, one date, a data range or a list of data.")
+@click.option(
+    "--start-time-freq",
+    default="",
+    help="start time freq, if --start-time is set YYYYMMDDHH/YYYYMMDDHH, use this option to generate a data list."
+)
 @click.option(
     "--engine",
     default="nwpc_message",
@@ -47,6 +52,7 @@ def plot_cli(
         production_type,
         production_name,
         start_time: str,
+        start_time_freq,
         engine,
         output_type,
         output_file,
@@ -54,7 +60,7 @@ def plot_cli(
     """
     Plot forecast time points.
     """
-    start_time = parse_start_time(start_time)
+    start_time = parse_start_time(start_time, start_time_freq)
 
     engine = get_engine(engine)
     logger.info(f"using search engine: {engine.__name__}")
