@@ -1,10 +1,9 @@
-import datetime
-
 import click
 from loguru import logger
 
+from nwpc_message_tool._util import get_engine
+from nwpc_message_tool.cli._util import parse_start_time
 from nwpc_message_tool.storage import EsMessageStorage
-from nwpc_message_tool import nmc_monitor, nwpc_message
 from nwpc_message_tool.presenter import PrintPresenter
 from nwpc_message_tool.processor import TableProcessor
 
@@ -23,20 +22,12 @@ from nwpc_message_tool.processor import TableProcessor
     help="data source"
 )
 def table_cli(elastic_server, system, production_stream, production_type, production_name, start_time: str, engine):
-    if "/" in start_time:
-        token = start_time.split("/")
-        start_time = tuple(datetime.datetime.strptime(t, "%Y%m%d%H") for t in token)
-    elif "," in start_time:
-        token = start_time.split(",")
-        start_time = list(datetime.datetime.strptime(t, "%Y%m%d%H") for t in token)
-    else:
-        start_time = datetime.datetime.strptime(start_time, "%Y%m%d%H")
-    if engine == "nwpc_message":
-        engine = nwpc_message
-    elif engine == "nmc_monitor":
-        engine = nmc_monitor
-    else:
-        raise NotImplemented(f"engine is not supported: {engine}")
+    """
+    Show messages as a table.
+    """
+    start_time = parse_start_time(start_time)
+
+    engine = get_engine(engine)
     logger.info(f"using search engine: {engine.__name__}")
 
     system = engine.fix_system_name(system)

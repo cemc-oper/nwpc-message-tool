@@ -6,7 +6,7 @@ import pandas as pd
 from nwpc_message_tool.message import ProductionEventMessage, EventStatus
 
 
-def fix_system_name(system: str):
+def fix_system_name(system: str) -> str:
     mapping = {
         "grapes_gfs_gmf": "nwpc_grapes_gfs",
         "grapes_meso_10km": "nwpc_grapes_meso_10km",
