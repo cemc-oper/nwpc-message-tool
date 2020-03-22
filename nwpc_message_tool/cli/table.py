@@ -9,15 +9,20 @@ from nwpc_message_tool.presenter import PrintPresenter
 from nwpc_message_tool.processor import TableProcessor
 
 
-@click.command()
+@click.command("table")
 @click.option("--elastic-server", required=True, multiple=True, help="ElasticSearch servers")
-@click.option("--system", required=True, help="system")
-@click.option("--production-stream", default="oper", help="stream")
-@click.option("--production-type", default="grib2", help="type")
-@click.option("--production-name", default="orig", help="name")
-@click.option("--start-time", required=True, help="name, YYYYMMDDHH[/YYYYMMDDHH]")
-@click.option("--engine", default="nwpc_message", type=click.Choice(["nwpc_message", "nmc_monitor"]))
-def cli(elastic_server, system, production_stream, production_type, production_name, start_time: str, engine):
+@click.option("--system", required=True, help="system, such as grapes_gfs_gmf, grapes_meso_3km and so on.")
+@click.option("--production-stream", default="oper", help="production stream, such as oper.")
+@click.option("--production-type", default="grib2", help="production type, such as grib.")
+@click.option("--production-name", default="orig", help="production name, such as orig.")
+@click.option("--start-time", required=True, help="start time, one date or a data range, YYYYMMDDHH[/YYYYMMDDHH].")
+@click.option(
+    "--engine",
+    default="nwpc_message",
+    type=click.Choice(["nwpc_message", "nmc_monitor"]),
+    help="data source"
+)
+def table_cli(elastic_server, system, production_stream, production_type, production_name, start_time: str, engine):
     if "/" in start_time:
         token = start_time.split("/")
         start_time = tuple(datetime.datetime.strptime(t, "%Y%m%d%H") for t in token)
@@ -58,4 +63,4 @@ def cli(elastic_server, system, production_stream, production_type, production_n
 
 
 if __name__ == "__main__":
-    cli()
+    table_cli()
