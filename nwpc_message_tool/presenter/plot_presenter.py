@@ -27,8 +27,12 @@ class PlotPresenter(Presenter):
     def show(self, table_data: pd.DataFrame):
         table_data = self._append_column(table_data)
 
-        forecast_hours = table_data.fh.unique()
-        start_times = table_data.st.unique()
+        forecast_hours = table_data.fh.unique().astype(int)
+        forecast_hours.sort()
+        forecast_hours = forecast_hours.astype(str)
+        start_times = table_data.st.unique().astype(int)
+        start_times.sort()
+        start_times = start_times.astype(str)
 
         cmap = LinearColorMapper(
             palette=cc.CET_L18,
