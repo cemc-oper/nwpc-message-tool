@@ -6,11 +6,13 @@ from nwpc_message_tool.cli._util import parse_start_time
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool.presenter import (
     StepGridPlotPresenter,
+    CyclePeriodPlotPresenter,
 )
 from nwpc_message_tool.processor import TableProcessor
 
 
 @click.command("plot")
+@click.option("--plot-type", default="step_grid", type=click.Choice(["step_grid", "cycle_period"]), help="type of plot")
 @click.option("--elastic-server", required=True, multiple=True, help="ElasticSearch servers")
 @click.option("--system", required=True, help="system, such as grapes_gfs_gmf, grapes_meso_3km and so on.")
 @click.option("--production-stream", default="oper", help="production stream, such as oper.")
@@ -38,6 +40,7 @@ from nwpc_message_tool.processor import TableProcessor
     help="output file path",
 )
 def plot_cli(
+        plot_type,
         elastic_server,
         system,
         production_stream,
@@ -77,12 +80,22 @@ def plot_cli(
 
     print(table)
 
-    presenter = StepGridPlotPresenter(
-        system=system,
-        output_type=("file",),
-        output_path=output_file,
-    )
-    presenter.show(table)
+    if plot_type == "step_grid":
+        presenter = StepGridPlotPresenter(
+            system=system,
+            output_type=("file",),
+            output_path=output_file,
+        )
+        presenter.show(table)
+    elif plot_type == "cycle_period":
+        presenter = CyclePeriodPlotPresenter(
+            system=system,
+            output_type=("file",),
+            output_path=output_file,
+        )
+        presenter.show(table)
+    else:
+        raise ValueError(f"plot type is not supported: {plot_type}")
 
 
 if __name__ == "__main__":

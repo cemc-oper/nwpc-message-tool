@@ -1,3 +1,4 @@
 from .print_presenter import PrintPresenter
 from .step_grid_plot_presenter import StepGridPlotPresenter
 from .table_store_presenter import TableStorePresenter
+from .cycle_period_plot_presenter import CyclePeriodPlotPresenter
