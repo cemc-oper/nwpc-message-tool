@@ -45,9 +45,12 @@ class TableProcessor(object):
             )
             df = df.append(current_df)
 
-        df["time"] = pd.to_datetime(df["time"], utc=True)
-        df["forecast_hour"] = pd.to_numeric(df["forecast_hour"])
-        df["start_time"] = pd.to_datetime(df["start_time"], utc=True)
+        if "time" in self.columns:
+            df["time"] = pd.to_datetime(df["time"], utc=True)
+        if "forecast_hour" in self.columns:
+            df["forecast_hour"] = pd.to_numeric(df["forecast_hour"])
+        if "start_time" in self.columns:
+            df["start_time"] = pd.to_datetime(df["start_time"], utc=True)
 
         logger.info(f"searching...done")
 
