@@ -4,7 +4,10 @@ from loguru import logger
 from nwpc_message_tool._util import get_engine
 from nwpc_message_tool.cli._util import parse_start_time
 from nwpc_message_tool.storage import EsMessageStorage
-from nwpc_message_tool.presenter import PrintPresenter
+from nwpc_message_tool.presenter import (
+    PrintPresenter,
+    TableStorePresenter,
+)
 from nwpc_message_tool.processor import TableProcessor
 
 
@@ -21,7 +24,27 @@ from nwpc_message_tool.processor import TableProcessor
     type=click.Choice(["nwpc_message", "nmc_monitor"]),
     help="data source"
 )
-def table_cli(elastic_server, system, production_stream, production_type, production_name, start_time: str, engine):
+@click.option(
+    "--output-type",
+    default="print",
+    type=click.Choice(["print", "json", "csv"]),
+    help="output type"
+)
+@click.option(
+    "--output-file",
+    help="output file path",
+)
+def table_cli(
+        elastic_server,
+        system,
+        production_stream,
+        production_type,
+        production_name,
+        start_time: str,
+        engine,
+        output_type,
+        output_file,
+):
     """
     Show messages as a table.
     """
@@ -49,8 +72,14 @@ def table_cli(elastic_server, system, production_stream, production_type, produc
     processor = TableProcessor()
     table = processor.process_messages(results)
 
-    presenter = PrintPresenter()
-    presenter.show(table)
+    if output_type == "print":
+        presenter = PrintPresenter()
+        presenter.show(table)
+    elif output_type in ["json", "csv"]:
+        presenter = TableStorePresenter(output_type=output_type, output_file=output_file)
+        presenter.show(table)
+    else:
+        raise ValueError(f"output type is not supported: {output_type}")
 
 
 if __name__ == "__main__":
