@@ -26,7 +26,10 @@ from nwpc_message_tool.processor import TableProcessor
 @click.option(
     "--start-time-freq",
     default="",
-    help="start time freq, if --start-time is set YYYYMMDDHH/YYYYMMDDHH, use this option to generate a data list."
+    help="start time range frequency, such as `D` means one point per day. "
+         "If --start-time is YYYYMMDDHH/YYYYMMDDHH, "
+         "use this option to generate a data list."
+         "see documentation of pandas.data_range for more detail."
 )
 @click.option(
     "--engine",
@@ -38,7 +41,8 @@ from nwpc_message_tool.processor import TableProcessor
     "--output-type",
     default="file",
     type=click.Choice(["file"]),
-    help="output type"
+    help="output type, currently only file is supported."
+         "Once the plot is done, a html file is writen to disk and is opened by default web browser."
 )
 @click.option(
     "--output-file",
@@ -58,7 +62,7 @@ def plot_cli(
         output_file,
 ):
     """
-    Plot forecast time points.
+    Plot for production message.
     """
     start_time = parse_start_time(start_time, start_time_freq)
 
