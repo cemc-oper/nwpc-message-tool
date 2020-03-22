@@ -4,7 +4,7 @@ Tools for nwpc-message-client.
 
 ## Getting started
 
-## Config
+
 
 ## LICENSE
 

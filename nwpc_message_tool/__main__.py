@@ -8,7 +8,11 @@ def cli():
     pass
 
 
-if __name__ == "__main__":
+def main():
     cli.add_command(table_cli, name="table")
     cli.add_command(plot_cli, name="plot")
     cli()
+
+
+if __name__ == "__main__":
+    main()
