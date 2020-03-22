@@ -8,14 +8,14 @@ import colorcet as cc
 from .presenter import Presenter
 
 
-class PlotPresenter(Presenter):
+class StepGridPlotPresenter(Presenter):
     def __init__(
             self,
             system="",
             output_type=("file",),
             output_path=None,
     ):
-        super(PlotPresenter, self).__init__()
+        super(StepGridPlotPresenter, self).__init__()
         self.system = system
         self.output_type = output_type
         self.output_path = output_path

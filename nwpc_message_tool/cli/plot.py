@@ -5,7 +5,7 @@ from nwpc_message_tool._util import get_engine
 from nwpc_message_tool.cli._util import parse_start_time
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool.presenter import (
-    PlotPresenter,
+    StepGridPlotPresenter,
 )
 from nwpc_message_tool.processor import TableProcessor
 
@@ -77,7 +77,7 @@ def plot_cli(
 
     print(table)
 
-    presenter = PlotPresenter(
+    presenter = StepGridPlotPresenter(
         system=system,
         output_type=("file",),
         output_path=output_file,
