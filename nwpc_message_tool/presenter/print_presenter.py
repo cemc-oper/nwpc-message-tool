@@ -10,7 +10,7 @@ class PrintPresenter(Presenter):
         super(PrintPresenter, self).__init__()
 
     def show(self, df: pd.DataFrame):
-        df["start_time"] = df.start_time.apply(lambda x: x.strftime("%Y%m%d%H"))
+        df.start_time = df.start_time.apply(lambda x: x.strftime("%Y%m%d%H"))
         with pd.option_context('display.max_rows', None, 'display.max_columns', None):
             print(df)
         print(f"Latest time: {df.time.max()}")
