@@ -8,7 +8,11 @@ from nwpc_message_tool.message import ProductionEventMessage
 
 
 class TableProcessor(object):
-    def __init__(self, columns: typing.List[str] or None = None):
+    def __init__(
+            self,
+            columns: typing.List[str] or None = None,
+            keep_duplicates: bool or str = "first",
+    ):
         self.columns = [
             "system",
             "stream",
@@ -22,6 +26,14 @@ class TableProcessor(object):
         ]
         if columns is not None:
             self.columns = columns
+        if keep_duplicates is False:
+            self.drop_duplicates = False
+        elif keep_duplicates is True:
+            self.drop_duplicates = True
+            self.keep_duplicates = "first"
+        elif isinstance(keep_duplicates, str):
+            self.drop_duplicates = True
+            self.keep_duplicates = keep_duplicates
 
     def process_messages(self, messages: typing.Iterable[ProductionEventMessage]) -> pd.DataFrame:
         df = pd.DataFrame(columns=self.columns)
@@ -56,4 +68,8 @@ class TableProcessor(object):
 
         logger.info(f"get {len(df)} results")
         df = df.sort_index()
+
+        if self.drop_duplicates:
+            df = df[~df.index.duplicated(keep=self.keep_duplicates)]
+
         return df
