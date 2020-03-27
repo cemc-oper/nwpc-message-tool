@@ -6,13 +6,13 @@ from nwpc_message_tool.cli._util import parse_start_time
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool.presenter import (
     StepGridPlotPresenter,
-    CyclePeriodPlotPresenter,
+    PeriodBarPlotPresenter,
 )
 from nwpc_message_tool.processor import TableProcessor
 
 
 @click.command("plot")
-@click.option("--plot-type", default="step_grid", type=click.Choice(["step_grid", "cycle_period"]), help="type of plot")
+@click.option("--plot-type", default="step_grid", type=click.Choice(["step_grid", "period_bar"]), help="type of plot")
 @click.option("--elastic-server", required=True, multiple=True, help="ElasticSearch servers")
 @click.option("--system", required=True, help="system, such as grapes_gfs_gmf, grapes_meso_3km and so on.")
 @click.option("--production-stream", default="oper", help="production stream, such as oper.")
@@ -97,8 +97,8 @@ def plot_cli(
             output_path=output_file,
         )
         presenter.show(table)
-    elif plot_type == "cycle_period":
-        presenter = CyclePeriodPlotPresenter(
+    elif plot_type == "period_bar":
+        presenter = PeriodBarPlotPresenter(
             system=system,
             output_type=("file",),
             output_path=output_file,

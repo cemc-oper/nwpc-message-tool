@@ -7,14 +7,14 @@ from bokeh.models.formatters import DatetimeTickFormatter
 from .presenter import Presenter
 
 
-class CyclePeriodPlotPresenter(Presenter):
+class PeriodBarPlotPresenter(Presenter):
     def __init__(
             self,
             system="",
             output_type=("file",),
             output_path=None,
     ):
-        super(CyclePeriodPlotPresenter, self).__init__()
+        super(PeriodBarPlotPresenter, self).__init__()
         self.system = system
         self.output_type = output_type
         self.output_path = output_path
