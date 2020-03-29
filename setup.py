@@ -30,7 +30,7 @@ setup(
     license='GPLv3',
 
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 3.6',
@@ -39,7 +39,7 @@ setup(
 
     keywords='nwpc message tool',
 
-    packages=find_packages(exclude=['docs', 'tests']),
+    packages=find_packages(exclude=["docs", "tests", "example"]),
 
     install_requires=[
         "pyyaml",
