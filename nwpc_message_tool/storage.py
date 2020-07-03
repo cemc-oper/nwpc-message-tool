@@ -56,7 +56,10 @@ class EsMessageStorage(MessageStorage):
         pbar = None
 
         indexes = self._engine.get_index(start_time)
+        indexes = set(indexes)
         for index in indexes:
+            search_from = 0
+            total = np.iinfo(np.int16).max
             while search_from < total:
                 res = self._get_result(
                     index=index,
