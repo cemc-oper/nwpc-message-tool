@@ -53,7 +53,7 @@ def get_production_query_body(
         conditions.append({"term": {"data.stream": production_stream}})
     if production_name is not None:
         conditions.append({"term": {"data.name": production_name}})
-    if type(start_time) == datetime.datetime:
+    if isinstance(start_time, datetime.datetime):
         conditions.append({"term": {"data.start_time": start_time.isoformat()}})
     elif isinstance(start_time, typing.Tuple):
         conditions.append({
