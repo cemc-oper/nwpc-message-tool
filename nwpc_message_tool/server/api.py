@@ -65,4 +65,7 @@ def get_prod_grib2():
             "times": parsed,
         })
 
-    return jsonify(result)
+    response = jsonify(result)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
