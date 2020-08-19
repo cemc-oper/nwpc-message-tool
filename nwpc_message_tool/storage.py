@@ -92,3 +92,67 @@ class EsMessageStorage(MessageStorage):
         # logger.debug(f"search body: {search_body}")
         res = self.client.search(index=index, body=search_body)
         return res
+
+    def save_production_standard_time_message(
+            self,
+            system: str,
+            production_type: str,
+            production_stream: str,
+            production_name: str,
+            start_hours: typing.List,
+    ):
+        index = "prod-standard-time"
+        message_id = f"{system}.{production_stream}.{production_type}.{production_name}"
+        self.client.index(
+            index,
+            {
+                "app": "nwpc-message-tool",
+                "type": "prduction-standard-time",
+                "time": datetime.datetime.now(),
+                "data": {
+                    "system": system,
+                    "stream": production_stream,
+                    "type": production_type,
+                    "name": production_name,
+                    "start_hours": start_hours,
+                }
+            },
+            id=message_id,
+        )
+
+    def get_production_standard_time_message(
+            self,
+            system: str,
+            production_type: str = None,
+            production_stream: str = None,
+            production_name: str = None,
+    ) -> typing.Iterable[ProductionEventMessage]:
+        query_body = self._engine.get_production_standard_time_body(
+            system=system,
+            production_stream=production_stream,
+            production_type=production_type,
+            production_name=production_name,
+        )
+
+        search_from = 0
+        total = np.iinfo(np.int16).max
+
+        index = "prod-standard-time"
+        search_from = 0
+        total = np.iinfo(np.int16).max
+        while search_from < total:
+            res = self._get_result(
+                index=index,
+                query_body=query_body,
+                search_from=search_from,
+                search_size=10,
+            )
+            current_total = res['hits']['total']['value']
+            if current_total < total:
+                total = current_total
+                logger.info(f"found results: {total}")
+                pbar = tqdm.tqdm(total=total)
+            search_from += len(res['hits']['hits'])
+            current_count = len(res["hits"]["hits"])
+            for hit in res['hits']['hits']:
+                yield self._engine.load_production_standard_time_message(hit["_source"])

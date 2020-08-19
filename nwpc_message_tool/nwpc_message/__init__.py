@@ -3,7 +3,11 @@ import datetime
 
 import pandas as pd
 
-from nwpc_message_tool.message import ProductionEventMessage, EventStatus
+from nwpc_message_tool.message import (
+    ProductionEventMessage,
+    EventStatus,
+    ProductionStandardTimeMessage
+)
 
 
 def fix_system_name(system: str) -> str:
@@ -79,3 +83,43 @@ def get_production_query_body(
         },
     }
     return query_body
+
+
+def get_production_standard_time_body(
+        system: str,
+        production_type: str = None,
+        production_stream: str = None,
+        production_name: str = None,
+) -> dict:
+    conditions = [{
+        "term": {"data.system": system}
+    }]
+    if production_type is not None:
+        conditions.append({"term": {"data.type": production_type}})
+    if production_stream is not None:
+        conditions.append({"term": {"data.stream": production_stream}})
+    if production_name is not None:
+        conditions.append({"term": {"data.name": production_name}})
+
+    query_body = {
+        "query": {
+            "bool": {
+                "filter": conditions
+            },
+        },
+    }
+    return query_body
+
+
+def load_production_standard_time_message(doc: dict) -> ProductionStandardTimeMessage:
+    data = doc["data"]
+    message = ProductionStandardTimeMessage(
+        message_type=doc["type"],
+        time=pd.Timestamp(doc["time"]),
+        system=data["system"],
+        stream=data["stream"],
+        production_type=data["type"],
+        production_name=data["name"],
+        start_hours=data["start_hours"]
+    )
+    return message
