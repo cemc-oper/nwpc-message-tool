@@ -6,7 +6,7 @@ import numpy as np
 from loguru import logger
 import tqdm
 
-from nwpc_message_tool.message import ProductionEventMessage
+from nwpc_message_tool.message import ProductionEventMessage, ProductionStandardTimeMessage
 from . import nwpc_message
 
 
@@ -126,7 +126,7 @@ class EsMessageStorage(MessageStorage):
             production_type: str = None,
             production_stream: str = None,
             production_name: str = None,
-    ) -> typing.Iterable[ProductionEventMessage]:
+    ) -> typing.Iterable[ProductionStandardTimeMessage]:
         query_body = self._engine.get_production_standard_time_body(
             system=system,
             production_stream=production_stream,
