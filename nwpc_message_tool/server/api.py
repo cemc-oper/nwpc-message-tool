@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from flask import Blueprint, request, current_app, jsonify
 
 from nwpc_message_tool import nwpc_message
@@ -31,6 +32,24 @@ def get_prod_grib2():
         engine=engine,
     )
 
+    # get standard times
+    standard_time_messages = list(client.get_production_standard_time_message(
+        system=system,
+        production_stream="oper",
+        production_type="grib2",
+        production_name="orig",
+    ))
+
+    if len(standard_time_messages) == 0:
+        standard_time_df = None
+    else:
+        standard_time_message = standard_time_messages[0]
+        standard_time_df = pd.DataFrame([
+            {**time, "start_hour": i["start_hour"]}
+            for i in standard_time_message.start_hours
+            for time in i["times"]
+        ])
+
     results = client.get_production_messages(
         system=system,
         production_stream="oper",
@@ -55,17 +74,33 @@ def get_prod_grib2():
 
         df_merged = pd.merge(df_full_hours, df_selected, how="left")
 
+        if standard_time_df is not None:
+            current_start_clock = pd.to_datetime(f"{query_date} {start_hour}:00 UTC")
+
+            start_hour_df = standard_time_df[standard_time_df["start_hour"] == start_hour][["forecast_hour", "duration"]]
+            start_hour_df_merged = pd.merge(df_merged, start_hour_df, how="left")
+            start_hour_df_merged["duration"] = start_hour_df_merged["duration"].apply(lambda x: pd.to_timedelta(x))
+            start_hour_df_merged["standard_time"] = start_hour_df_merged["duration"] + current_start_clock
+
+            start_hour_df_merged["flag"] = np.where(
+                start_hour_df_merged["time"] > start_hour_df_merged["standard_time"],
+                "late",
+                "normal",
+            )
+
+            df_merged = start_hour_df_merged[["forecast_hour", "time", "standard_time", "flag"]]
+
         start_hour_json = df_merged.to_json(
             orient="records",
             date_format="iso",
         )
-        parsed = json.loads(start_hour_json)
+        current_production_times = json.loads(start_hour_json)
+
         result.append({
             "start_hour": start_hour,
-            "times": parsed,
+            "times": current_production_times,
         })
 
     response = jsonify(result)
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
-
