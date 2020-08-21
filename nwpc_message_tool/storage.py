@@ -4,7 +4,7 @@ import typing
 from elasticsearch import Elasticsearch
 import numpy as np
 from loguru import logger
-import tqdm
+from tqdm.auto import tqdm
 
 from nwpc_message_tool.message import ProductionEventMessage, ProductionStandardTimeMessage
 from . import nwpc_message
@@ -71,7 +71,7 @@ class EsMessageStorage(MessageStorage):
                 if current_total < total:
                     total = current_total
                     logger.info(f"found results: {total}")
-                    pbar = tqdm.tqdm(total=total)
+                    pbar = tqdm(total=total)
                 search_from += len(res['hits']['hits'])
                 current_count = len(res["hits"]["hits"])
                 if pbar is not None:
@@ -151,7 +151,6 @@ class EsMessageStorage(MessageStorage):
             if current_total < total:
                 total = current_total
                 logger.info(f"found results: {total}")
-                pbar = tqdm.tqdm(total=total)
             search_from += len(res['hits']['hits'])
             current_count = len(res["hits"]["hits"])
             for hit in res['hits']['hits']:
