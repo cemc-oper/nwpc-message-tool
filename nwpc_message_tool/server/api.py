@@ -82,8 +82,9 @@ def get_prod_grib2():
             start_hour_df_merged["duration"] = start_hour_df_merged["duration"].apply(lambda x: pd.to_timedelta(x))
             start_hour_df_merged["standard_time"] = start_hour_df_merged["duration"] + current_start_clock
 
+            # ceil to minute when compare time with standard time.
             start_hour_df_merged["flag"] = np.where(
-                start_hour_df_merged["time"] > start_hour_df_merged["standard_time"],
+                start_hour_df_merged["time"].apply(lambda x: x.ceil("min")) > start_hour_df_merged["standard_time"].apply(lambda x: x.ceil("min")),
                 "late",
                 "normal",
             )
