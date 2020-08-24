@@ -10,10 +10,12 @@ class StandardTimeProcessor(object):
             self,
             start_hours: typing.List,
             bootstrap_count: int = 1000,
+            bootstrap_sample: int =10,
             quantile: float = 0.95,
     ):
         self.start_hours = start_hours
         self.bootstrap_count = bootstrap_count
+        self.bootstrap_sample = bootstrap_sample
         self.quantile = quantile
 
     def process_data(self, table: pd.DataFrame) -> typing.List:
@@ -33,7 +35,10 @@ class StandardTimeProcessor(object):
                 clock_df_hour = df_start_hour[df_start_hour["forecast_hour"] == forecast_hour]
                 means = []
                 for i in range(self.bootstrap_count):
-                    sampled_data = clock_df_hour["clock"].sample(n=20, replace=True)
+                    sampled_data = clock_df_hour["clock"].sample(
+                        n=self.bootstrap_sample,
+                        replace=True,
+                    )
                     means.append(sampled_data.mean())
 
                 bdf = pd.DataFrame(means).applymap(lambda x: x.ceil("s"))
