@@ -77,10 +77,10 @@ def get_prod_grib2():
         if standard_time_df is not None:
             current_start_clock = pd.to_datetime(f"{query_date} {start_hour}:00 UTC")
 
-            start_hour_df = standard_time_df[standard_time_df["start_hour"] == start_hour][["forecast_hour", "duration"]]
+            start_hour_df = standard_time_df[standard_time_df["start_hour"] == start_hour][["forecast_hour", "upper_duration"]]
             start_hour_df_merged = pd.merge(df_merged, start_hour_df, how="left")
-            start_hour_df_merged["duration"] = start_hour_df_merged["duration"].apply(lambda x: pd.to_timedelta(x))
-            start_hour_df_merged["standard_time"] = start_hour_df_merged["duration"] + current_start_clock
+            start_hour_df_merged["upper_duration"] = start_hour_df_merged["upper_duration"].apply(lambda x: pd.to_timedelta(x))
+            start_hour_df_merged["standard_time"] = start_hour_df_merged["upper_duration"] + current_start_clock
 
             # ceil to minute when compare time with standard time.
             start_hour_df_merged["flag"] = np.where(

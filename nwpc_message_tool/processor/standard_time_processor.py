@@ -10,8 +10,8 @@ class StandardTimeProcessor(object):
             self,
             start_hours: typing.List,
             bootstrap_count: int = 1000,
-            bootstrap_sample: int =10,
-            quantile: float = 0.95,
+            bootstrap_sample: int = 10,
+            quantile: float = 0.99,
     ):
         self.start_hours = start_hours
         self.bootstrap_count = bootstrap_count
@@ -42,14 +42,20 @@ class StandardTimeProcessor(object):
                     means.append(sampled_data.mean())
 
                 bdf = pd.DataFrame(means).applymap(lambda x: x.ceil("s"))
-                standard_time = bdf.quantile(
-                    self.quantile,
+                upper_bound = bdf.quantile(
+                    self.quantile + (1 - self.quantile) / 2,
                     numeric_only=False,
                     interpolation="nearest"
                 )
+                lower_bound = bdf.quantile(
+                    (1 - self.quantile) / 2,
+                    numeric_only=False,
+                    interpolation="nearest",
+                )
                 standard_times.append({
                     "forecast_hour": forecast_hour,
-                    "clock": standard_time[0],
+                    "upper_bound": upper_bound[0],
+                    "lower_bound": lower_bound[0],
                 })
             times.append({
                 "start_hour": start_hour,
@@ -61,12 +67,13 @@ class StandardTimeProcessor(object):
         ]
 
         for df in prod_time_dfs:
-            df["duration"] = df["clock"].apply(lambda x: x.isoformat())
+            df["upper_duration"] = df["upper_bound"].apply(lambda x: x.isoformat())
+            df["lower_duration"] = df["lower_bound"].apply(lambda x: x.isoformat())
 
         production_times = [
             {
                 "start_hour": self.start_hours[index]["start_hour"],
-                "times": df[["forecast_hour", "duration"]].to_dict(orient="record")
+                "times": df[["forecast_hour", "upper_duration", "lower_duration"]].to_dict(orient="record")
             } for index, df in enumerate(prod_time_dfs)
         ]
 
