@@ -2,6 +2,7 @@ import typing
 import datetime
 
 import pandas as pd
+import numpy as np
 
 from nwpc_message_tool.message import (
     ProductionEventMessage,
@@ -35,7 +36,7 @@ def get_index(start_time: datetime.datetime or typing.Tuple or typing.List = Non
     if isinstance(start_time, typing.Tuple):
         time_series = pd.date_range(start=pd.Timestamp(start_time[0]), end=pd.Timestamp(start_time[1]), freq="D")
         return [h.strftime("%Y-%m") for h in time_series]
-    elif isinstance(start_time, typing.List):
+    elif isinstance(start_time, typing.List) or isinstance(start_time, np.ndarray) or isinstance(start_time, pd.DatetimeIndex):
         return [h.strftime("%Y-%m") for h in start_time]
     return [start_time.strftime("%Y-%m")]
 
