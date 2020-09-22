@@ -1,7 +1,6 @@
 from flask import current_app
 
 from nwpc_message_tool import nwpc_message
-from nwpc_message_tool.cli._util import parse_start_time
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool.processor import TableProcessor
 
@@ -10,8 +9,8 @@ from bokeh.plotting import figure
 from bokeh.models.formatters import DatetimeTickFormatter
 from bokeh.models.tools import HoverTool
 
-from bokeh.embed import file_html
-from bokeh.resources import CDN
+from bokeh.embed import file_html, json_item
+from bokeh.resources import CDN, INLINE
 
 import pandas as pd
 
@@ -107,8 +106,8 @@ def get_cycle_time_line(
         y1="lower_time",
         x="forecast_hour",
         source=standard_source,
-        color="PapayaWhip",
-        alpha=0.6
+        color="green",
+        alpha=0.2,
     )
 
     p.line(
@@ -121,4 +120,11 @@ def get_cycle_time_line(
     p.xaxis.axis_label = "Forecast hour"
     p.yaxis.axis_label = "Clock (UTC)"
 
-    return file_html(p, CDN, "my plot")
+    return p
+
+
+def get_html(plot):
+    return file_html(plot, CDN, "my plot")
+
+def get_json(plot):
+    return json_item(plot)
