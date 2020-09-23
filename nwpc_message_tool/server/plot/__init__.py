@@ -126,5 +126,6 @@ def get_cycle_time_line(
 def get_html(plot):
     return file_html(plot, CDN, "my plot")
 
+
 def get_json(plot):
     return json_item(plot)
