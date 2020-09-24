@@ -76,6 +76,13 @@ def get_production_query_body(
             }
         })
 
+    if forecast_time is not None:
+        conditions.append({
+            "term": {
+                "data.forecast_time": forecast_time
+            }
+        })
+
     query_body = {
         "query": {
             "bool": {
