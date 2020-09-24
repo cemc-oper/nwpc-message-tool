@@ -16,9 +16,9 @@ def get_index_page():
 @main_app.route('/plot/cycle/time-line')
 def get_cycle_time_line_plot():
     from nwpc_message_tool.server.plot import (
-        get_cycle_time_line,
         get_html,
     )
+    from nwpc_message_tool.server.plot.cycle import get_cycle_time_line
 
     system = request.args.get("system", None)
     start_time = request.args.get("start-time", None)
@@ -35,9 +35,9 @@ def get_cycle_time_line_plot():
 @main_app.route('/plot/cycle/time-line/json')
 def get_cycle_time_line_plot_json():
     from nwpc_message_tool.server.plot import (
-        get_cycle_time_line,
         get_json,
     )
+    from nwpc_message_tool.server.plot.cycle import get_cycle_time_line
 
     system = request.args.get("system", None)
     start_time = request.args.get("start-time", None)
@@ -47,6 +47,64 @@ def get_cycle_time_line_plot_json():
     output_json = get_json(get_cycle_time_line(
         system=system,
         start_time=start_time
+    ))
+
+    response = jsonify(output_json)
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
+
+
+@main_app.route('/plot/forecast/time-line')
+def get_forecast_time_line_plot():
+    from nwpc_message_tool.server.plot import (
+        get_html,
+    )
+    from nwpc_message_tool.server.plot.forecast import get_forecast_time_line
+
+    system = request.args.get("system", None)
+    start_time = request.args.get("start-time", None)
+    start_hour = int(start_time[-2:])
+    start_time = pd.to_datetime(start_time, format="%Y%m%d%H")
+    start_time = (
+        start_time - pd.Timedelta(days=30),
+        start_time
+    )
+    forecast_hour = int(request.args.get("forecast-hour", None))
+    print(start_time, forecast_hour)
+
+    output_html = get_html(get_forecast_time_line(
+        system=system,
+        start_time=start_time,
+        start_hour=start_hour,
+        forecast_hour=forecast_hour
+    ))
+
+    return make_response(output_html)
+
+
+@main_app.route('/plot/forecast/time-line/json')
+def get_forecast_time_line_plot_json():
+    from nwpc_message_tool.server.plot import (
+        get_json,
+    )
+    from nwpc_message_tool.server.plot.forecast import get_forecast_time_line
+
+    system = request.args.get("system", None)
+    start_time = request.args.get("start-time", None)
+    start_hour = int(start_time[-2:])
+    start_time = pd.to_datetime(start_time, format="%Y%m%d%H")
+    start_time = (
+        start_time - pd.Timedelta(days=30),
+        start_time
+    )
+    forecast_hour = int(request.args.get("forecast-hour", None))
+    print(start_time, forecast_hour)
+
+    output_json = get_json(get_forecast_time_line(
+        system=system,
+        start_time=start_time,
+        start_hour=start_hour,
+        forecast_hour=forecast_hour
     ))
 
     response = jsonify(output_json)
