@@ -88,7 +88,7 @@ def get_forecast_time_line(
         plot_width=1000,
         plot_height=500,
         x_axis_type="datetime",
-        title=f"Production time for GRAPES GFS ({forecast_hour:03}h)",
+        title=f"Production time for {system} ({forecast_hour:03}h)",
         tools=tools,
     )
 

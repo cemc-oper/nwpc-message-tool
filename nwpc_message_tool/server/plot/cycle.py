@@ -81,7 +81,7 @@ def get_cycle_time_line(
         plot_width=1000,
         plot_height=500,
         y_axis_type="datetime",
-        title=f"Production time for GRAPES GFS ({start_time})",
+        title=f"Production time for {system} ({start_time})",
         tools=tools,
     )
 
