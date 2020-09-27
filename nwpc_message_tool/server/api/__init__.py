@@ -55,7 +55,8 @@ def get_prod_grib2():
         production_stream="oper",
         production_type="grib2",
         production_name="orig",
-        start_time=start_time
+        start_time=start_time,
+        size=40,
     )
 
     processor = TableProcessor()
