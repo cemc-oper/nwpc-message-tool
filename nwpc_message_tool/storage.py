@@ -84,7 +84,13 @@ class EsMessageStorage(MessageStorage):
         if pbar is not None:
             pbar.close()
 
-    def _get_result(self, index: str, query_body: dict, search_from: int, search_size: int):
+    def _get_result(
+            self,
+            index: str,
+            query_body: typing.Dict,
+            search_from: int,
+            search_size: int
+    ) -> typing.Dict:
         # logger.debug(f"searching from {search_from} with size {search_size}...")
         search_body = {
             "size": search_size,
@@ -92,7 +98,10 @@ class EsMessageStorage(MessageStorage):
         }
         search_body.update(**query_body)
         # logger.debug(f"search body: {search_body}")
-        res = self.client.search(index=index, body=search_body)
+        res = self.client.search(
+            index=index,
+            body=search_body
+        )
         return res
 
     def save_production_standard_time_message(

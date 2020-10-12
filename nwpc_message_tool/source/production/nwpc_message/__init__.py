@@ -33,7 +33,11 @@ def load_message(doc: dict) -> ProductionEventMessage:
 
 def get_index(start_time: datetime.datetime or typing.Tuple or typing.List = None) -> typing.List[str]:
     if isinstance(start_time, typing.Tuple):
-        time_series = pd.date_range(start=pd.Timestamp(start_time[0]), end=pd.Timestamp(start_time[1]), freq="D")
+        time_series = pd.date_range(
+            start=pd.Timestamp(start_time[0]),
+            end=pd.Timestamp(start_time[1]),
+            freq="D"
+        )
         return [h.strftime("%Y-%m") for h in time_series]
     elif isinstance(start_time, typing.List) or isinstance(start_time, np.ndarray) or isinstance(start_time, pd.DatetimeIndex):
         return [h.strftime("%Y-%m") for h in start_time]
@@ -47,7 +51,7 @@ def get_production_query_body(
         production_name: str = None,
         start_time: datetime.datetime or typing.Tuple or typing.List = None,
         forecast_time: str = None,
-) -> dict:
+) -> typing.Dict:
     conditions = [{
         "term": {"data.system": system}
     }]
@@ -91,13 +95,26 @@ def get_production_query_body(
     }
     return query_body
 
+def load_production_standard_time_message(doc: dict) -> ProductionStandardTimeMessage:
+    data = doc["data"]
+    message = ProductionStandardTimeMessage(
+        message_type=doc["type"],
+        time=pd.Timestamp(doc["time"]),
+        system=data["system"],
+        stream=data["stream"],
+        production_type=data["type"],
+        production_name=data["name"],
+        start_hours=data["start_hours"]
+    )
+    return message
+
 
 def get_production_standard_time_body(
         system: str,
         production_type: str = None,
         production_stream: str = None,
         production_name: str = None,
-) -> dict:
+) -> typing.Dict:
     conditions = [{
         "term": {"data.system": system}
     }]
@@ -116,17 +133,3 @@ def get_production_standard_time_body(
         },
     }
     return query_body
-
-
-def load_production_standard_time_message(doc: dict) -> ProductionStandardTimeMessage:
-    data = doc["data"]
-    message = ProductionStandardTimeMessage(
-        message_type=doc["type"],
-        time=pd.Timestamp(doc["time"]),
-        system=data["system"],
-        stream=data["stream"],
-        production_type=data["type"],
-        production_name=data["name"],
-        start_hours=data["start_hours"]
-    )
-    return message
