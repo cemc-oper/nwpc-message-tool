@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from flask import Blueprint, request, current_app, jsonify
 
-from nwpc_message_tool import nwpc_message
+from nwpc_message_tool.source.production import nwpc_message
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool.processor import TableProcessor
 from nwpc_message_tool.server.systems_config import systems_config

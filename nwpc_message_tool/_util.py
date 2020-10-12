@@ -1,4 +1,7 @@
-from nwpc_message_tool import nwpc_message, nmc_monitor
+from nwpc_message_tool.source.production import (
+    nwpc_message,
+    nmc_monitor
+)
 from nwpc_message_tool.message import ProductionEventMessage
 
 
