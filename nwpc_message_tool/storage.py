@@ -6,8 +6,10 @@ import numpy as np
 from loguru import logger
 from tqdm.auto import tqdm
 
-from nwpc_message_tool.message import ProductionEventMessage, ProductionStandardTimeMessage
-from . import nwpc_message
+from nwpc_message_tool.message import (
+    ProductionEventMessage, ProductionStandardTimeMessage
+)
+from nwpc_message_tool import nwpc_message
 
 
 class MessageStorage(object):

@@ -5,11 +5,10 @@ import pandas as pd
 import numpy as np
 
 from nwpc_message_tool.message import (
-    ProductionEventMessage,
     EventStatus,
-    ProductionStandardTimeMessage
+    ProductionEventMessage,
+    ProductionStandardTimeMessage,
 )
-
 
 def fix_system_name(system: str) -> str:
     return system
