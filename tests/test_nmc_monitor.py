@@ -1,6 +1,6 @@
 import pandas as pd
 
-from nwpc_message_tool.nmc_monitor import load_message
+from nwpc_message_tool.source.production.nmc_monitor import load_message
 from nwpc_message_tool.message import EventStatus
 
 
