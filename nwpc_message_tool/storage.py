@@ -7,7 +7,9 @@ from loguru import logger
 from tqdm.auto import tqdm
 
 from nwpc_message_tool.message import (
-    ProductionEventMessage, ProductionStandardTimeMessage
+    ProductionEventMessage,
+    ProductionStandardTimeMessage,
+    EcflowClientMessage
 )
 from nwpc_message_tool.source.production import nwpc_message
 
@@ -80,6 +82,53 @@ class EsMessageStorage(MessageStorage):
                     pbar.update(current_count)
                 for hit in res['hits']['hits']:
                     yield self._engine.load_message(hit["_source"])
+
+        if pbar is not None:
+            pbar.close()
+
+    def get_ecflow_client_messages(
+            self,
+            engine,
+            node_name: str,
+            ecflow_host: str = None,
+            ecflow_port: str = None,
+            ecf_date: datetime.datetime or typing.Tuple or typing.List = None,
+            size: int = 20,
+    ) -> typing.Iterable[EcflowClientMessage]:
+        query_body = engine.get_query_body(
+            node_name=node_name,
+            ecflow_host=ecflow_host,
+            ecflow_port=ecflow_port,
+            ecf_date=ecf_date,
+        )
+
+        search_from = 0
+        total = np.iinfo(np.int16).max
+        pbar = None
+
+        indexes = engine.get_index(ecf_date)
+        index = ",".join(indexes)
+
+        search_from = 0
+        total = np.iinfo(np.int16).max
+        while search_from < total:
+            res = self._get_result(
+                index=index,
+                query_body=query_body,
+                search_from=search_from,
+                search_size=size,
+            )
+            current_total = res['hits']['total']['value']
+            if current_total < total:
+                total = current_total
+                logger.info(f"found results: {total}")
+                pbar = tqdm(total=total)
+            search_from += len(res['hits']['hits'])
+            current_count = len(res["hits"]["hits"])
+            if pbar is not None:
+                pbar.update(current_count)
+            for hit in res['hits']['hits']:
+                yield engine.load_message(hit["_source"])
 
         if pbar is not None:
             pbar.close()

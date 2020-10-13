@@ -3,3 +3,4 @@ from .production import (
     ProductionEventMessage,
     ProductionStandardTimeMessage,
 )
+from .ecflow_client import EcflowClientMessage
