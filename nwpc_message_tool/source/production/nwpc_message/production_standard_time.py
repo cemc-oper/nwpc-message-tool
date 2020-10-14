@@ -43,3 +43,7 @@ def get_query_body(
         },
     }
     return query_body
+
+
+def get_index(**kwargs):
+    return "prod-standard-time"

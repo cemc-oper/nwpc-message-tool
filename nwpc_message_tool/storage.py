@@ -205,7 +205,7 @@ class EsMessageStorage(MessageStorage):
         search_from = 0
         total = np.iinfo(np.int16).max
 
-        index = "prod-standard-time"
+        index = engine.get_index()
         search_from = 0
         total = np.iinfo(np.int16).max
         while search_from < total:
