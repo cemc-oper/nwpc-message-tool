@@ -1,5 +1,6 @@
 import datetime
 import typing
+from abc import ABC, abstractmethod
 
 from elasticsearch import Elasticsearch
 import numpy as np
@@ -16,10 +17,11 @@ from nwpc_message_tool.message import (
 )
 
 
-class MessageStorage(object):
+class MessageStorage(ABC):
     def __init__(self):
         pass
 
+    @abstractmethod
     def get_production_messages(
             self,
             system,
@@ -30,11 +32,33 @@ class MessageStorage(object):
             forecast_time,
             engine,
     ) -> typing.Iterable[ProductionEventMessage]:
-        raise NotImplemented()
+        pass
+
+    @abstractmethod
+    def get_ecflow_client_messages(
+            self,
+            node_name,
+            ecflow_host,
+            ecflow_port,
+            ecf_date,
+            engine,
+    ) -> typing.Iterable[EcflowClientMessage]:
+        pass
+
+    @abstractmethod
+    def get_production_standard_time_message(
+            self,
+            system,
+            production_type,
+            production_stream,
+            production_name,
+            engine,
+    ) -> typing.Iterable[ProductionStandardTimeMessage]:
+        pass
 
 
 class EsMessageStorage(MessageStorage):
-    def __init__(self, hosts: list):
+    def __init__(self, hosts: typing.List):
         super(EsMessageStorage, self).__init__()
         self.client = Elasticsearch(hosts=hosts)
 
