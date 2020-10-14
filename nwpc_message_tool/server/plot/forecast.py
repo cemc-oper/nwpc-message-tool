@@ -1,3 +1,6 @@
+import datetime
+import typing
+
 import pandas as pd
 from bokeh.models import (
     ColumnDataSource,
@@ -5,30 +8,33 @@ from bokeh.models import (
     DatetimeTickFormatter,
     BoxAnnotation
 )
-from bokeh.plotting import figure
+from bokeh.plotting import figure, Figure
 from flask import current_app
 
-from nwpc_message_tool import nwpc_message
+from nwpc_message_tool.source.production import nwpc_message
 from nwpc_message_tool.processor import TableProcessor
 from nwpc_message_tool.storage import EsMessageStorage
 
 
 def get_forecast_time_line(
-        start_time,
+        start_time: typing.Union[
+            datetime.datetime,
+            pd.Timestamp,
+            typing.Tuple[typing.Union[datetime.datetime, pd.Timestamp], typing.Union[datetime.datetime, pd.Timestamp]]
+        ],
         start_hour: int,
         forecast_hour: int,
         system: str,
-        production_stream="oper",
-        production_type="grib2",
-        production_name="orig",
-):
+        production_stream: str="oper",
+        production_type: str="grib2",
+        production_name: str="orig",
+) -> Figure:
     engine = nwpc_message
     hosts = current_app.config["SERVER_CONFIG"]["message_storage"]["hosts"]
     system = engine.fix_system_name(system)
 
     client = EsMessageStorage(
         hosts=hosts,
-        engine=engine,
     )
 
     results = client.get_production_messages(
@@ -37,7 +43,8 @@ def get_forecast_time_line(
         production_type=production_type,
         production_name=production_name,
         forecast_time=f"{forecast_hour:03}h",
-        start_time=start_time
+        start_time=start_time,
+        engine=engine.production,
     )
 
     processor = TableProcessor()
@@ -53,6 +60,7 @@ def get_forecast_time_line(
         production_stream="oper",
         production_type="grib2",
         production_name="orig",
+        engine=nwpc_message.production_standard_time,
     ))
 
     standard_time_message = standard_time_messages[0]

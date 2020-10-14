@@ -1,6 +1,12 @@
 from flask import Blueprint, jsonify, make_response, request
-
 import pandas as pd
+
+from nwpc_message_tool.server.plot import (
+    get_cycle_time_line,
+    get_forecast_time_line,
+    get_html,
+    get_json,
+)
 
 
 main_app = Blueprint('main_app', __name__, template_folder='template')
@@ -15,11 +21,6 @@ def get_index_page():
 
 @main_app.route('/plot/cycle/time-line')
 def get_cycle_time_line_plot():
-    from nwpc_message_tool.server.plot import (
-        get_html,
-    )
-    from nwpc_message_tool.server.plot.cycle import get_cycle_time_line
-
     system = request.args.get("system", None)
     start_time = request.args.get("start-time", None)
     start_time = pd.to_datetime(start_time, format="%Y%m%d%H")
@@ -34,11 +35,6 @@ def get_cycle_time_line_plot():
 
 @main_app.route('/plot/cycle/time-line/json')
 def get_cycle_time_line_plot_json():
-    from nwpc_message_tool.server.plot import (
-        get_json,
-    )
-    from nwpc_message_tool.server.plot.cycle import get_cycle_time_line
-
     system = request.args.get("system", None)
     start_time = request.args.get("start-time", None)
     start_time = pd.to_datetime(start_time, format="%Y%m%d%H")
@@ -56,11 +52,6 @@ def get_cycle_time_line_plot_json():
 
 @main_app.route('/plot/forecast/time-line')
 def get_forecast_time_line_plot():
-    from nwpc_message_tool.server.plot import (
-        get_html,
-    )
-    from nwpc_message_tool.server.plot.forecast import get_forecast_time_line
-
     system = request.args.get("system", None)
     start_time = request.args.get("start-time", None)
     start_hour = int(start_time[-2:])
@@ -84,13 +75,9 @@ def get_forecast_time_line_plot():
 
 @main_app.route('/plot/forecast/time-line/json')
 def get_forecast_time_line_plot_json():
-    from nwpc_message_tool.server.plot import (
-        get_json,
-    )
-    from nwpc_message_tool.server.plot.forecast import get_forecast_time_line
-
     system = request.args.get("system", None)
     start_time = request.args.get("start-time", None)
+
     start_hour = int(start_time[-2:])
     start_time = pd.to_datetime(start_time, format="%Y%m%d%H")
     start_time = (

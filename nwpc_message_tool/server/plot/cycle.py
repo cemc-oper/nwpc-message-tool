@@ -1,20 +1,27 @@
+import datetime
+import typing
+
 import pandas as pd
 from bokeh.models import ColumnDataSource, HoverTool, DatetimeTickFormatter
-from bokeh.plotting import figure
+from bokeh.plotting import figure, Figure
 from flask import current_app
 
-from nwpc_message_tool import nwpc_message
+from nwpc_message_tool.source.production import nwpc_message
 from nwpc_message_tool.processor import TableProcessor
 from nwpc_message_tool.storage import EsMessageStorage
 
 
 def get_cycle_time_line(
-        start_time,
-        system,
-        production_stream="oper",
-        production_type="grib2",
-        production_name="orig",
-):
+        start_time: typing.Union[
+            datetime.datetime,
+            pd.Timestamp,
+            typing.Tuple[typing.Union[datetime.datetime, pd.Timestamp], typing.Union[datetime.datetime, pd.Timestamp]]
+        ],
+        system: str,
+        production_stream: str="oper",
+        production_type: str="grib2",
+        production_name: str="orig",
+) -> Figure:
     engine = nwpc_message
 
     hosts = current_app.config["SERVER_CONFIG"]["message_storage"]["hosts"]
@@ -23,14 +30,14 @@ def get_cycle_time_line(
 
     client = EsMessageStorage(
         hosts=hosts,
-        engine=engine,
     )
     results = client.get_production_messages(
         system=system,
         production_stream=production_stream,
         production_type=production_type,
         production_name=production_name,
-        start_time=start_time
+        start_time=start_time,
+        engine=engine.production,
     )
 
     processor = TableProcessor()
@@ -43,6 +50,7 @@ def get_cycle_time_line(
         production_stream=production_stream,
         production_type=production_type,
         production_name=production_name,
+        engine=nwpc_message.production_standard_time,
     ))
 
     standard_time_message = standard_time_messages[0]
