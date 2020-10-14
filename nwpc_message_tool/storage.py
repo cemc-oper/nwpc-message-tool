@@ -6,12 +6,14 @@ import numpy as np
 from loguru import logger
 from tqdm.auto import tqdm
 
+import nwpc_message_tool.source.production.nwpc_message
+import nwpc_message_tool.source.ecflow_client
+
 from nwpc_message_tool.message import (
     ProductionEventMessage,
     ProductionStandardTimeMessage,
     EcflowClientMessage
 )
-from nwpc_message_tool.source.production import nwpc_message
 
 
 class MessageStorage(object):
@@ -26,15 +28,15 @@ class MessageStorage(object):
             production_name,
             start_time,
             forecast_time,
+            engine,
     ) -> typing.Iterable[ProductionEventMessage]:
         raise NotImplemented()
 
 
 class EsMessageStorage(MessageStorage):
-    def __init__(self, hosts: list, engine=nwpc_message):
+    def __init__(self, hosts: list):
         super(EsMessageStorage, self).__init__()
         self.client = Elasticsearch(hosts=hosts)
-        self._engine = engine
 
     def get_production_messages(
             self,
@@ -44,9 +46,10 @@ class EsMessageStorage(MessageStorage):
             production_name: str = None,
             start_time: datetime.datetime or typing.Tuple or typing.List = None,
             forecast_time: str = None,
+            engine = nwpc_message_tool.source.production.nwpc_message.production,
             size: int = 20,
     ) -> typing.Iterable[ProductionEventMessage]:
-        query_body = self._engine.get_production_query_body(
+        query_body = engine.get_query_body(
             system=system,
             production_stream=production_stream,
             production_type=production_type,
@@ -59,7 +62,7 @@ class EsMessageStorage(MessageStorage):
         total = np.iinfo(np.int16).max
         pbar = None
 
-        indexes = self._engine.get_index(start_time)
+        indexes = engine.get_index(start_time)
         indexes = set(indexes)
         for index in indexes:
             search_from = 0
@@ -81,20 +84,24 @@ class EsMessageStorage(MessageStorage):
                 if pbar is not None:
                     pbar.update(current_count)
                 for hit in res['hits']['hits']:
-                    yield self._engine.load_message(hit["_source"])
+                    yield engine.load_message(hit["_source"])
 
         if pbar is not None:
             pbar.close()
 
     def get_ecflow_client_messages(
             self,
-            engine,
             node_name: str,
             ecflow_host: str = None,
             ecflow_port: str = None,
             ecf_date: datetime.datetime or typing.Tuple or typing.List = None,
+            index_ecf_date: datetime.datetime or typing.Tuple or typing.List = None,
+            engine = nwpc_message_tool.source.ecflow_client,
             size: int = 20,
     ) -> typing.Iterable[EcflowClientMessage]:
+        if index_ecf_date is None:
+            index_ecf_date = ecf_date
+
         query_body = engine.get_query_body(
             node_name=node_name,
             ecflow_host=ecflow_host,
@@ -106,7 +113,7 @@ class EsMessageStorage(MessageStorage):
         total = np.iinfo(np.int16).max
         pbar = None
 
-        indexes = engine.get_index(ecf_date)
+        indexes = engine.get_index(index_ecf_date)
         index = ",".join(indexes)
 
         search_from = 0
@@ -186,8 +193,9 @@ class EsMessageStorage(MessageStorage):
             production_type: str = None,
             production_stream: str = None,
             production_name: str = None,
+            engine = nwpc_message_tool.source.production.nwpc_message.production_standard_time
     ) -> typing.Iterable[ProductionStandardTimeMessage]:
-        query_body = self._engine.get_production_standard_time_body(
+        query_body = engine.get_query_body(
             system=system,
             production_stream=production_stream,
             production_type=production_type,
@@ -214,4 +222,4 @@ class EsMessageStorage(MessageStorage):
             search_from += len(res['hits']['hits'])
             current_count = len(res["hits"]["hits"])
             for hit in res['hits']['hits']:
-                yield self._engine.load_production_standard_time_message(hit["_source"])
+                yield engine.load_message(hit["_source"])

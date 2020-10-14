@@ -22,14 +22,12 @@ def get_prod_grib2():
         pd.to_datetime(f"{query_date} 23:00:00"),
     )
 
-    engine = nwpc_message
-    system = engine.fix_system_name(system_name)
+    system = nwpc_message.fix_system_name(system_name)
 
     hosts = current_app.config["SERVER_CONFIG"]["message_storage"]["hosts"]
 
     client = EsMessageStorage(
         hosts=hosts,
-        engine=engine,
     )
 
     # get standard times
@@ -38,6 +36,7 @@ def get_prod_grib2():
         production_stream="oper",
         production_type="grib2",
         production_name="orig",
+        engine=nwpc_message.production_standard_time,
     ))
 
     if len(standard_time_messages) == 0:
@@ -57,6 +56,7 @@ def get_prod_grib2():
         production_name="orig",
         start_time=start_time,
         size=40,
+        engine=nwpc_message.production,
     )
 
     processor = TableProcessor()

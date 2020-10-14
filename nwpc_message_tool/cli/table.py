@@ -63,14 +63,14 @@ def table_cli(
     logger.info(f"searching...")
     client = EsMessageStorage(
         hosts=elastic_server,
-        engine=engine,
     )
     results = client.get_production_messages(
         system=system,
         production_stream=production_stream,
         production_type=production_type,
         production_name=production_name,
-        start_time=start_time
+        start_time=start_time,
+        engine=engine.production,
     )
 
     processor = TableProcessor()
