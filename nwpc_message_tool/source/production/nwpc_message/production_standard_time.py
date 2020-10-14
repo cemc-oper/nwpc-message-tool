@@ -5,7 +5,7 @@ import pandas as pd
 from nwpc_message_tool.message import ProductionStandardTimeMessage
 
 
-def load_message(doc: dict) -> ProductionStandardTimeMessage:
+def load_message(doc: typing.Dict) -> ProductionStandardTimeMessage:
     data = doc["data"]
     message = ProductionStandardTimeMessage(
         message_type=doc["type"],

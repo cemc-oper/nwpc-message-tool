@@ -2,7 +2,10 @@ import typing
 
 import pandas as pd
 
-from nwpc_message_tool.message.event import EventStatus, EventMessage
+from nwpc_message_tool.message.event import (
+    EventStatus,
+    EventMessage,
+)
 
 
 class ProductionEventMessage(EventMessage):
@@ -41,7 +44,7 @@ class ProductionStandardTimeMessage(EventMessage):
             **kwargs,
     ):
         super(ProductionStandardTimeMessage, self).__init__(**kwargs)
-        self.message_type = "production"
+        self.message_type = "production-standard"
         self.system: str = system
         self.stream: str = stream
         self.production_type: str = production_type

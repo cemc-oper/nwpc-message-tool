@@ -58,7 +58,10 @@ class MessageStorage(ABC):
 
 
 class EsMessageStorage(MessageStorage):
-    def __init__(self, hosts: typing.List):
+    def __init__(
+            self,
+            hosts: typing.List,
+    ):
         super(EsMessageStorage, self).__init__()
         self.client = Elasticsearch(hosts=hosts)
 

@@ -4,7 +4,10 @@ import typing
 import pandas as pd
 
 
-def parse_start_time(start_time: str, start_time_freq: str = "") -> (
+def parse_start_time(
+        start_time: str,
+        start_time_freq: str = ""
+) -> (
         datetime.datetime or
         typing.Tuple[datetime.datetime] or
         typing.List[datetime.datetime]
