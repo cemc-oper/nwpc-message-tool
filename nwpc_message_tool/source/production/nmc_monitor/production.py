@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from nwpc_message_tool.message import ProductionEventMessage, EventStatus
+from nwpc_message_tool._type import StartTimeType
 
 
 def load_message(doc: dict) -> ProductionEventMessage:
@@ -29,7 +30,7 @@ def load_message(doc: dict) -> ProductionEventMessage:
 
 
 def get_index(
-        start_time: datetime.datetime or typing.Tuple or typing.List = None
+        start_time: StartTimeType = None
 ) -> typing.List[str]:
     if isinstance(start_time, typing.Tuple):
         time_series = pd.date_range(
@@ -45,7 +46,7 @@ def get_index(
 
 def get_query_body(
         system: str,
-        start_time: datetime.datetime or typing.Tuple or typing.List = None,
+        start_time: StartTimeType = None,
         # production_type: str = None,
         # production_stream: str = None,
         # production_name: str = None,

@@ -5,7 +5,7 @@ from flask import Blueprint, request, current_app, jsonify
 from nwpc_message_tool.source.production import nwpc_message
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool.processor import TableProcessor
-from nwpc_message_tool.server.systems_config import systems_config
+from nwpc_message_tool.server.systems_config import SystemsConfig
 
 import json
 
@@ -63,7 +63,7 @@ def get_prod_grib2():
     df = processor.process_messages(results)
 
     result = []
-    system_config = systems_config[system]
+    system_config = SystemsConfig[system]
     for item in system_config["start_hours"]:
         start_hour = item["start_hour"]
         df_start_hour = df[df["start_time"] == f"{query_date} {start_hour}:00:00"]

@@ -15,8 +15,8 @@ class EcflowClientMessage(EventMessage):
             ecflow_port: str = None,
             node_name: str = None,
             node_rid: str = None,
-            try_no: str or int = None,
-            ecf_date: str or datetime.datetime or pd.Timestamp = None,
+            try_no: typing.Union[str, int] = None,
+            ecf_date: typing.Union[str, datetime.datetime] = None,
             **kwargs
     ):
         super(EcflowClientMessage, self).__init__(

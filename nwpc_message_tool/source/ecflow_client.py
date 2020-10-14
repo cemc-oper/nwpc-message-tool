@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from nwpc_message_tool.message import EcflowClientMessage
+from nwpc_message_tool._type import StartTimeType
 
 
 def load_message(doc: dict) -> EcflowClientMessage:
@@ -29,7 +30,7 @@ def get_query_body(
         node_name: str,
         ecflow_host: str = None,
         ecflow_port: str = None,
-        ecf_date: datetime.datetime or typing.Tuple or typing.List = None
+        ecf_date: StartTimeType = None
 ) -> typing.Dict:
     conditions = [{
         "term": {
@@ -82,7 +83,7 @@ def get_query_body(
 
 
 def get_index(
-        ecf_date: datetime.datetime or typing.Tuple or typing.List = None
+        ecf_date: typing.Union[StartTimeType, np.ndarray, pd.DatetimeIndex] = None
 ) -> typing.List[str]:
     if isinstance(ecf_date, typing.Tuple):
         time_series = pd.date_range(

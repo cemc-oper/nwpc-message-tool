@@ -9,14 +9,11 @@ from flask import current_app
 from nwpc_message_tool.source.production import nwpc_message
 from nwpc_message_tool.processor import TableProcessor
 from nwpc_message_tool.storage import EsMessageStorage
+from nwpc_message_tool._type import StartTimeType
 
 
 def get_cycle_time_line(
-        start_time: typing.Union[
-            datetime.datetime,
-            pd.Timestamp,
-            typing.Tuple[typing.Union[datetime.datetime, pd.Timestamp], typing.Union[datetime.datetime, pd.Timestamp]]
-        ],
+        start_time: StartTimeType,
         system: str,
         production_stream: str="oper",
         production_type: str="grib2",

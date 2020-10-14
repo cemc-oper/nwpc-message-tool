@@ -9,6 +9,7 @@ from tqdm.auto import tqdm
 
 import nwpc_message_tool.source.production.nwpc_message
 import nwpc_message_tool.source.ecflow_client
+from nwpc_message_tool._type import StartTimeType
 
 from nwpc_message_tool.message import (
     ProductionEventMessage,
@@ -71,7 +72,7 @@ class EsMessageStorage(MessageStorage):
             production_type: str = None,
             production_stream: str = None,
             production_name: str = None,
-            start_time: datetime.datetime or typing.Tuple or typing.List = None,
+            start_time: StartTimeType = None,
             forecast_time: str = None,
             engine = nwpc_message_tool.source.production.nwpc_message.production,
             size: int = 20,
@@ -121,8 +122,8 @@ class EsMessageStorage(MessageStorage):
             node_name: str,
             ecflow_host: str = None,
             ecflow_port: str = None,
-            ecf_date: datetime.datetime or typing.Tuple or typing.List = None,
-            index_ecf_date: datetime.datetime or typing.Tuple or typing.List = None,
+            ecf_date: StartTimeType = None,
+            index_ecf_date: StartTimeType = None,
             engine = nwpc_message_tool.source.ecflow_client,
             size: int = 20,
     ) -> typing.Iterable[EcflowClientMessage]:

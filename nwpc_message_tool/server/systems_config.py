@@ -1,7 +1,7 @@
 import numpy as np
 
 
-systems_config = {
+SystemsConfig = {
     "grapes_gfs_gmf": {
         "start_hours": [
             {
