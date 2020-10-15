@@ -98,4 +98,4 @@ def get_index(
             or isinstance(ecf_date, pd.DatetimeIndex)
     ):
         return [h.strftime("ecflow-client-%Y-%m-%d") for h in ecf_date]
-    return [ecf_date.strftime("%Y-%m-%d")]
+    return [f'ecflow-client-{ecf_date.strftime("%Y-%m-%d")}']
