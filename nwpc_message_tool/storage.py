@@ -62,9 +62,13 @@ class EsMessageStorage(MessageStorage):
     def __init__(
             self,
             hosts: typing.List,
+            debug: bool = True,
+            show_progress: bool = True,
     ):
         super(EsMessageStorage, self).__init__()
         self.client = Elasticsearch(hosts=hosts)
+        self.debug: bool = debug
+        self.show_progress: bool = show_progress
 
     def get_production_messages(
             self,
@@ -156,8 +160,10 @@ class EsMessageStorage(MessageStorage):
             current_total = res['hits']['total']['value']
             if current_total < total:
                 total = current_total
-                logger.info(f"found results: {total}")
-                pbar = tqdm(total=total)
+                if self.debug:
+                    logger.info(f"found results: {total}")
+                if self.show_progress:
+                    pbar = tqdm(total=total)
             search_from += len(res['hits']['hits'])
             current_count = len(res["hits"]["hits"])
             if pbar is not None:
