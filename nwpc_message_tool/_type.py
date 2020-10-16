@@ -12,4 +12,5 @@ StartTimeType = typing.Union[
     TimeType,
     typing.Tuple[TimeType, TimeType],
     typing.List[TimeType],
+    pd.DatetimeIndex,
 ]
