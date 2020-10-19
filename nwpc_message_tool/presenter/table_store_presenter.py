@@ -6,7 +6,11 @@ from nwpc_message_tool.presenter.presenter import Presenter
 
 
 class TableStorePresenter(Presenter):
-    def __init__(self, output_type: str, output_file: str):
+    def __init__(
+            self,
+            output_type: str,
+            output_file: str
+    ):
         super(TableStorePresenter, self).__init__()
         self.output_type = output_type
         self.output_file = output_file

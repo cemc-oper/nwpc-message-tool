@@ -18,7 +18,10 @@ class StandardTimeProcessor(object):
         self.bootstrap_sample = bootstrap_sample
         self.quantile = quantile
 
-    def process_data(self, table: pd.DataFrame) -> typing.List:
+    def process_data(
+            self,
+            table: pd.DataFrame
+    ) -> typing.List:
         table["start_hour"] = table["start_time"].apply(lambda x: x.strftime("%H"))
         table["clock"] = table["time"] - table["start_time"]
 

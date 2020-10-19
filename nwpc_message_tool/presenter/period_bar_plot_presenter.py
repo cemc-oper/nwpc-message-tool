@@ -23,7 +23,10 @@ class PeriodBarPlotPresenter(Presenter):
         elif "notebook" in output_type:
             output_notebook()
 
-    def show(self, table_data: pd.DataFrame):
+    def show(
+            self,
+            table_data: pd.DataFrame
+    ):
         table_data = self._append_column(table_data)
         grouped = table_data["time_length"].groupby(table_data["st"])
         grouped_table = grouped.agg(["min", "max"])

@@ -10,8 +10,8 @@ from nwpc_message_tool.message import ProductionEventMessage
 class TableProcessor(object):
     def __init__(
             self,
-            columns: typing.List[str] or None = None,
-            keep_duplicates: bool or str = "first",
+            columns: typing.Optional[typing.List[str]] = None,
+            keep_duplicates: typing.Union[bool, str] = "first",
     ):
         self.columns = [
             "system",
@@ -35,7 +35,10 @@ class TableProcessor(object):
             self.drop_duplicates = True
             self.keep_duplicates = keep_duplicates
 
-    def process_messages(self, messages: typing.Iterable[ProductionEventMessage]) -> pd.DataFrame:
+    def process_messages(
+            self,
+            messages: typing.Iterable[ProductionEventMessage]
+    ) -> pd.DataFrame:
         df = pd.DataFrame(columns=self.columns)
         for result in messages:
             hours = get_hour(result)

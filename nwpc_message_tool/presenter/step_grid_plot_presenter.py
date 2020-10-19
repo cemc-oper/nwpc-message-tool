@@ -1,3 +1,6 @@
+import typing
+import pathlib
+
 import pandas as pd
 import numpy as np
 from bokeh.io import output_file, output_notebook, show
@@ -11,9 +14,9 @@ from .presenter import Presenter
 class StepGridPlotPresenter(Presenter):
     def __init__(
             self,
-            system="",
+            system: str="",
             output_type=("file",),
-            output_path=None,
+            output_path: typing.Optional[typing.Union[str, pathlib.Path]]=None,
     ):
         super(StepGridPlotPresenter, self).__init__()
         self.system = system
