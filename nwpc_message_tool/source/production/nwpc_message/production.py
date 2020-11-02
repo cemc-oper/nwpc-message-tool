@@ -91,5 +91,10 @@ def get_query_body(
                 "filter": conditions
             },
         },
+        "sort": [
+            {
+                "time": "asc"
+            }
+        ]
     }
     return query_body
