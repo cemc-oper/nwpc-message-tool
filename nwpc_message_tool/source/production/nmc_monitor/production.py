@@ -84,5 +84,10 @@ def get_query_body(
                 "filter": conditions
             },
         },
+        "sort": [
+            {
+                "datetime": "asc"
+            }
+        ]
     }
     return query_body
