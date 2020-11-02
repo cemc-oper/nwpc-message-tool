@@ -26,9 +26,9 @@ class TableProcessor(object):
         ]
         if columns is not None:
             self.columns = columns
-        if keep_duplicates is False:
+        if keep_duplicates is True:
             self.drop_duplicates = False
-        elif keep_duplicates is True:
+        elif keep_duplicates is False:
             self.drop_duplicates = True
             self.keep_duplicates = "first"
         elif isinstance(keep_duplicates, str):
@@ -49,7 +49,7 @@ class TableProcessor(object):
                     "stream": [result.stream],
                     "type": [result.production_type],
                     "name": [result.production_name],
-                    "start_time": [pd.to_datetime(result.start_time)],
+                    "start_time": [result.start_time],
                     "forecast_hour": [hours],
                     "time": [message_time],
                     "event": [result.event],
@@ -67,12 +67,11 @@ class TableProcessor(object):
         if "start_time" in self.columns:
             df["start_time"] = pd.to_datetime(df["start_time"], utc=True)
 
-        logger.info(f"searching...done")
-
         logger.info(f"get {len(df)} results")
         df = df.sort_index()
 
         if self.drop_duplicates:
             df = df[~df.index.duplicated(keep=self.keep_duplicates)]
+            logger.debug(f"get {len(df)} results after drop duplicates")
 
         return df
