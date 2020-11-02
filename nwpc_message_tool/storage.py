@@ -109,8 +109,9 @@ class EsMessageStorage(MessageStorage):
                 current_total = res['hits']['total']['value']
                 if current_total < total:
                     total = current_total
-                    logger.info(f"found results: {total}")
-                    pbar = tqdm(total=total)
+                    logger.info(f"[{system}] found results: {total}")
+                    if self.show_progress:
+                        pbar = tqdm(total=total)
                 search_from += len(res['hits']['hits'])
                 current_count = len(res["hits"]["hits"])
                 if pbar is not None:
@@ -252,7 +253,7 @@ class EsMessageStorage(MessageStorage):
             current_total = res['hits']['total']['value']
             if current_total < total:
                 total = current_total
-                logger.info(f"found results: {total}")
+                logger.info(f"[{system}] found results: {total}")
             search_from += len(res['hits']['hits'])
             current_count = len(res["hits"]["hits"])
             for hit in res['hits']['hits']:
