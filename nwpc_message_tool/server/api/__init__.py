@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from flask import Blueprint, request, current_app, jsonify
+from loguru import logger
 
 from nwpc_message_tool.source.production import nwpc_message
 from nwpc_message_tool.storage import EsMessageStorage
@@ -28,6 +29,7 @@ def get_prod_grib2():
 
     client = EsMessageStorage(
         hosts=hosts,
+        show_progress=False,
     )
 
     # get standard times
@@ -59,21 +61,31 @@ def get_prod_grib2():
         engine=nwpc_message.production,
     )
 
-    processor = TableProcessor()
+    processor = TableProcessor(
+        keep_duplicates=False,
+    )
     df = processor.process_messages(results)
+    logger.debug(f"[{system}] API table has {len(df)} records")
 
     result = []
     system_config = SystemsConfig[system]
     for item in system_config["start_hours"]:
         start_hour = item["start_hour"]
-        df_start_hour = df[df["start_time"] == f"{query_date} {start_hour}:00:00"]
+        df_start_hour = df[df["start_time"] == pd.to_datetime(f"{query_date} {start_hour}:00:00 UTC")]
         df_selected = df_start_hour[["forecast_hour","time"]]
+        logger.debug(f"[{system}][{start_hour}] select {len(df_selected)} records")
 
         df_full_hours = pd.DataFrame({
             "forecast_hour": item["forecast_hours"],
         })
 
         df_merged = pd.merge(df_full_hours, df_selected, how="left")
+
+        # # check na
+        # df_merged_na = df_merged["forecast_hour"][df_merged["time"].isna()]
+        # if len(df_merged_na) > 0:
+        #     # print(f"{system}/{start_hour}:", df_merged_na)
+        #     pass
 
         if standard_time_df is not None:
             current_start_clock = pd.to_datetime(f"{query_date} {start_hour}:00 UTC")
