@@ -118,4 +118,10 @@ def get_cycle_time_line(
     p.xaxis.axis_label = "Forecast hour"
     p.yaxis.axis_label = "Clock (UTC)"
 
+    p.title.text_font_size = '16pt'
+    p.xaxis.axis_label_text_font_size = '14pt'
+    p.yaxis.axis_label_text_font_size = '14pt'
+    p.xaxis.major_label_text_font_size = "14pt"
+    p.yaxis.major_label_text_font_size = "14pt"
+
     return p

@@ -130,4 +130,10 @@ def get_forecast_time_line(
     p.xaxis.axis_label = "Start Time"
     p.yaxis.axis_label = "Clock (Hour)"
 
+    p.title.text_font_size = '16pt'
+    p.xaxis.axis_label_text_font_size = '14pt'
+    p.yaxis.axis_label_text_font_size = '14pt'
+    p.xaxis.major_label_text_font_size = "14pt"
+    p.yaxis.major_label_text_font_size = "14pt"
+
     return p
