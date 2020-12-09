@@ -63,7 +63,7 @@ class EsMessageStorage(MessageStorage):
             self,
             hosts: typing.List,
             debug: bool = True,
-            show_progress: bool = True,
+            show_progress: bool = False,
     ):
         super(EsMessageStorage, self).__init__()
         self.client = Elasticsearch(hosts=hosts)
