@@ -12,6 +12,7 @@ class StandardTimeProcessor(object):
             bootstrap_count: int = 1000,
             bootstrap_sample: int = 10,
             quantile: float = 0.99,
+            show_progress: bool = False,
     ):
         """
 
@@ -33,10 +34,11 @@ class StandardTimeProcessor(object):
         self.bootstrap_count = bootstrap_count
         self.bootstrap_sample = bootstrap_sample
         self.quantile = quantile
+        self.show_progress = show_progress
 
     def process_data(
             self,
-            table: pd.DataFrame
+            table: pd.DataFrame,
     ) -> typing.List:
         table["start_hour"] = table["start_time"].apply(lambda x: x.strftime("%H"))
         table["clock"] = table["time"] - table["start_time"]
@@ -49,7 +51,12 @@ class StandardTimeProcessor(object):
             df_start_hour = table[table["start_hour"] == start_hour][["forecast_hour", "clock"]]
             standard_times = []
 
-            for hour_index in tqdm(range(len(forecast_hours)), desc=f"{start_hour} hour loop"):
+            if self.show_progress:
+                forecast_hours_range = tqdm(range(len(forecast_hours)), desc=f"{start_hour} hour loop")
+            else:
+                forecast_hours_range = forecast_hours
+
+            for hour_index in forecast_hours_range:
                 forecast_hour = forecast_hours[hour_index]
                 clock_df_hour = df_start_hour[df_start_hour["forecast_hour"] == forecast_hour]
 
