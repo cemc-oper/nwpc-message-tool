@@ -120,7 +120,7 @@ def get_forecast_time_line(
         hours=['%H:%M:%S']
     )
 
-    p.line(
+    p.circle(
         y="clock",
         x="time",
         source=current_source,
