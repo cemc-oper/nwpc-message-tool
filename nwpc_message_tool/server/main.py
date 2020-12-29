@@ -54,10 +54,11 @@ def get_cycle_time_line_plot_json():
 def get_forecast_time_line_plot():
     system = request.args.get("system", None)
     start_time = request.args.get("start-time", None)
+    days = int(request.args.get("days", 30))
     start_hour = int(start_time[-2:])
     start_time = pd.to_datetime(start_time, format="%Y%m%d%H")
     start_time = (
-        start_time - pd.Timedelta(days=30),
+        start_time - pd.Timedelta(days=days),
         start_time
     )
     forecast_hour = int(request.args.get("forecast-hour", None))
@@ -77,11 +78,12 @@ def get_forecast_time_line_plot():
 def get_forecast_time_line_plot_json():
     system = request.args.get("system", None)
     start_time = request.args.get("start-time", None)
+    days = int(request.args.get("days", 30))
 
     start_hour = int(start_time[-2:])
     start_time = pd.to_datetime(start_time, format="%Y%m%d%H")
     start_time = (
-        start_time - pd.Timedelta(days=30),
+        start_time - pd.Timedelta(days=days),
         start_time
     )
     forecast_hour = int(request.args.get("forecast-hour", None))
