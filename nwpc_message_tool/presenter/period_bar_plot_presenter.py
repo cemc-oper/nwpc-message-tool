@@ -1,5 +1,12 @@
+import typing
+import pathlib
+
 import pandas as pd
-from bokeh.io import output_file, output_notebook, show
+from bokeh.io import (
+    output_file,
+    output_notebook,
+    show,
+)
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure
 from bokeh.models.formatters import DatetimeTickFormatter
@@ -10,9 +17,9 @@ from .presenter import Presenter
 class PeriodBarPlotPresenter(Presenter):
     def __init__(
             self,
-            system="",
-            output_type=("file",),
-            output_path=None,
+            system: str="",
+            output_type: typing.Tuple[str]=("file",),
+            output_path: typing.Optional[typing.Union[pathlib.Path, str]]=None,
     ):
         super(PeriodBarPlotPresenter, self).__init__()
         self.system = system
@@ -46,13 +53,23 @@ class PeriodBarPlotPresenter(Presenter):
             hourmin=['%H:%M:%S'],
             hours=['%H:%M:%S']
         )
-        p.hbar(y="st", left='min', right='max', height=0.4, source=source)
+        p.hbar(
+            y="st",
+            left='min',
+            right='max',
+            height=0.4,
+            source=source
+        )
 
         p.xaxis.axis_label = "Time Clock"
 
         show(p)
 
     def _append_column(self, table_data: pd.DataFrame):
-        table_data["st"] = table_data.start_time.apply(lambda x: x.strftime("%Y%m%d%H"))
-        table_data["time_length"] = table_data["time"].apply(lambda x: (x + pd.Timedelta(hours=8)).time())
+        table_data["st"] = table_data.start_time.apply(
+            lambda x: x.strftime("%Y%m%d%H")
+        )
+        table_data["time_length"] = table_data["time"].apply(
+            lambda x: (x + pd.Timedelta(hours=8)).time()
+        )
         return table_data
