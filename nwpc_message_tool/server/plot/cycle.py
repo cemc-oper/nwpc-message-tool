@@ -66,7 +66,7 @@ def get_cycle_time_line(
     current_source = ColumnDataSource(table)
     standard_source = ColumnDataSource(current_standard)
 
-    tools = "pan,wheel_zoom,box_zoom,reset"
+    tools = "pan,wheel_zoom,box_zoom,reset,save"
 
     hover_tool = HoverTool(
         tooltips=[

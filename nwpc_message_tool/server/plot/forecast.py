@@ -76,7 +76,7 @@ def get_forecast_time_line(
 
     current_source = ColumnDataSource(source_table)
 
-    tools = "pan,wheel_zoom,box_zoom,reset"
+    tools = "pan,wheel_zoom,box_zoom,reset,save"
 
     hover_tool = HoverTool(
         tooltips=[
