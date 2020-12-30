@@ -133,6 +133,9 @@ class EsMessageStorage(MessageStorage):
         if pbar is not None:
             pbar.close()
 
+        if scroll_id is not None:
+            self.client.clear_scroll(scroll_id=scroll_id)
+
     def get_ecflow_client_messages(
             self,
             node_name: str,
