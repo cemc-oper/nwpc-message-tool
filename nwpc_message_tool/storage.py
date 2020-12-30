@@ -93,25 +93,36 @@ class EsMessageStorage(MessageStorage):
         search_from = 0
         total = np.iinfo(np.int16).max
         pbar = None
+        scroll = "1m"
+        scroll_id = None
 
         indexes = engine.get_index(start_time)
         indexes = set(indexes)
         for index in indexes:
             search_from = 0
             total = np.iinfo(np.int16).max
+
             while search_from < total:
-                res = self._get_result(
-                    index=index,
-                    query_body=query_body,
-                    search_from=search_from,
-                    search_size=size,
-                )
-                current_total = res['hits']['total']['value']
-                if current_total < total:
+                if search_from == 0:
+                    res = self._get_result(
+                        index=index,
+                        query_body=query_body,
+                        search_from=search_from,
+                        search_size=size,
+                        scroll=scroll,
+                    )
+                    current_total = res['hits']['total']['value']
+                    scroll_id = res["_scroll_id"]
                     total = current_total
                     logger.info(f"[{system}] found results: {total}")
                     if self.show_progress:
                         pbar = tqdm(total=total)
+                else:
+                    res = self._get_result_scroll(
+                        scroll=scroll,
+                        scroll_id=scroll_id,
+                    )
+
                 search_from += len(res['hits']['hits'])
                 current_count = len(res["hits"]["hits"])
                 if pbar is not None:
@@ -180,7 +191,8 @@ class EsMessageStorage(MessageStorage):
             index: str,
             query_body: typing.Dict,
             search_from: int,
-            search_size: int
+            search_size: int,
+            scroll = None
     ) -> typing.Dict:
         # logger.debug(f"searching from {search_from} with size {search_size}...")
         search_body = {
@@ -191,7 +203,19 @@ class EsMessageStorage(MessageStorage):
         # logger.debug(f"search body: {search_body}")
         res = self.client.search(
             index=index,
-            body=search_body
+            body=search_body,
+            scroll=scroll,
+        )
+        return res
+
+    def _get_result_scroll(
+            self,
+            scroll: str,
+            scroll_id: str,
+    ) -> typing.Dict:
+        res = self.client.scroll(
+            scroll=scroll,
+            scroll_id=scroll_id
         )
         return res
 
