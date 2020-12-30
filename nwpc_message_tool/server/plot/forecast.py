@@ -117,7 +117,8 @@ def get_forecast_time_line(
         minsec=['%H:%M:%S'],
         minutes=['%H:%M:%S'],
         hourmin=['%H:%M:%S'],
-        hours=['%H:%M:%S']
+        hours=['%H:%M:%S'],
+        days=['%H:%M:%S'],
     )
 
     p.circle(
