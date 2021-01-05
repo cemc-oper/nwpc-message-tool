@@ -234,7 +234,7 @@ class EsMessageStorage(MessageStorage):
         message_id = f"{system}.{production_stream}.{production_type}.{production_name}"
         self.client.index(
             index,
-            {
+            body={
                 "app": "nwpc-message-tool",
                 "type": "prduction-standard-time",
                 "time": datetime.datetime.now(),
