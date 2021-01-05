@@ -29,5 +29,8 @@ class EcflowClientMessage(EventMessage):
         self.ecflow_port = ecflow_port
         self.node_name = node_name
         self.node_rid = node_rid
-        self.try_no = int(try_no)
+        if try_no.isdigit():
+            self.try_no = int(try_no)
+        else:
+            pass
         self.ecf_date = pd.to_datetime(ecf_date)
