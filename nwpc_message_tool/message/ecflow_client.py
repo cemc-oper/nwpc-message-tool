@@ -33,4 +33,4 @@ class EcflowClientMessage(EventMessage):
             self.try_no = int(try_no)
         else:
             pass
-        self.ecf_date = pd.to_datetime(ecf_date)
+        self.ecf_date = pd.to_datetime(ecf_date, format="%Y%m%d").tz_localize('UTC')
