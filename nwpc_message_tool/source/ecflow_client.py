@@ -8,7 +8,20 @@ from nwpc_message_tool.message import EcflowClientMessage
 from nwpc_message_tool._type import StartTimeType
 
 
-def load_message(doc: dict) -> EcflowClientMessage:
+def load_message(doc: typing.Dict) -> EcflowClientMessage:
+    """
+    Get EcflowClientMessage from dict document.
+
+    Parameters
+    ----------
+    doc:
+        document retrieved from ElasticSearch
+
+    Returns
+    -------
+    EcflowClientMessage
+        ecflow client message object.
+    """
     data = doc["data"]
     message = EcflowClientMessage(
         message_type=doc["type"],
@@ -32,6 +45,25 @@ def get_query_body(
         ecflow_port: str = None,
         ecf_date: StartTimeType = None
 ) -> typing.Dict:
+    """
+    Get query body for ElasticSearch
+
+    Parameters
+    ----------
+    node_name:
+        node path
+    ecflow_host:
+        ecflow host, such as login_b01
+    ecflow_port:
+        ecflow port
+    ecf_date:
+        search dates, filter the ``data.ecf_date`` field.
+
+    Returns
+    -------
+    typing.Dict:
+        search body
+    """
     conditions = [{
         "term": {
             "data.ecf_name.keyword": node_name
@@ -90,6 +122,24 @@ def get_query_body(
 def get_index(
         ecf_date: typing.Union[StartTimeType, np.ndarray, pd.DatetimeIndex] = None
 ) -> typing.List[str]:
+    """
+    Get index list for ElasticSearch.
+
+    Index rule:
+        One index per day, begin with "ecflow-client-", such as:
+
+        - ecflow-2021-04-20
+        - ecflow-2021-04-01
+
+    Parameters
+    ----------
+    ecf_date:
+        search dates
+    Returns
+    -------
+    typing.List[str]:
+        index string list for ElasticSearch.
+    """
     if isinstance(ecf_date, typing.Tuple):
         time_series = pd.date_range(
             start=pd.Timestamp(ecf_date[0]),
