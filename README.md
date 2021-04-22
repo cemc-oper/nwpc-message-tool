@@ -71,6 +71,6 @@ More examples are under `example` directory.
 
 ## LICENSE
 
-Copyright &copy; 2020 perillaroc at nwpc-oper.
+Copyright &copy; 2020-2021, Perilla Roc at nwpc-oper.
 
 `nwpc-message-tool` is license under [GPL v3.0](./LICENSE.md).
