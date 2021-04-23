@@ -88,7 +88,7 @@ def get_query_body(
                     "data.ecf_date": ecf_date.strftime("%Y%m%d")
                 }
             })
-        elif isinstance(ecf_date, typing.List):
+        elif isinstance(ecf_date, typing.List) or isinstance(ecf_date, pd.DatetimeIndex):
             conditions.append({
                 "terms": {
                     "data.ecf_date": [d.strftime("%Y%m%d") for d in ecf_date]
@@ -120,7 +120,7 @@ def get_query_body(
 
 
 def get_index(
-        ecf_date: typing.Union[StartTimeType, np.ndarray, pd.DatetimeIndex] = None
+        ecf_date: typing.Union[StartTimeType, np.ndarray] = None
 ) -> typing.List[str]:
     """
     Get index list for ElasticSearch.
