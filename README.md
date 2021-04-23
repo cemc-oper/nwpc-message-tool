@@ -1,6 +1,6 @@
 # nwpc-message-tool
 
-Tools for nwpc-message-client.
+Analytics tools for NWPC Message Platform.
 
 ## Introduction
 
