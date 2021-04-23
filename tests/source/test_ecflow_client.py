@@ -163,7 +163,6 @@ def test_get_index():
         "ecflow-client-2021-04-23"
     ]
 
-
     ecf_date = pd.date_range(
         pd.to_datetime("2021-04-20"),
         pd.to_datetime("2021-04-23"),
