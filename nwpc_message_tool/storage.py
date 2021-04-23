@@ -78,9 +78,65 @@ class EsMessageStorage(MessageStorage):
             production_name: str = None,
             start_time: StartTimeType = None,
             forecast_time: str = None,
-            engine = nwpc_message_tool.source.production.nwpc_message.production,
+            engine = None,
             size: int = 20,
     ) -> typing.Iterable[ProductionEventMessage]:
+        """
+        Get production messages from ElasticSearch.
+
+        Examples
+        --------
+
+        >>> import pandas as pd
+        >>> from nwpc_message_tool import EsMessageStorage
+        >>> storage = EsMessageStorage(
+        ...    hosts=["localhost:9200"]
+        ... )
+        >>> results = storage.get_production_messages(
+        ...     system="grapes_gfs_gmf",
+        ...     production_stream="oper",
+        ...     production_type="grib2",
+        ...     production_name="orig",
+        ...     start_time=pd.to_datetime("2021-04-01 00:00"),
+        ...     forecast_time="240h"
+        ... )
+        >>> for m in results:
+        ...     print(m.time)
+        2021-04-01 05:21:04.833865600+00:00
+
+        Parameters
+        ----------
+        system:
+            system which generates the product, such as
+
+            - grapes_gfs_gmf
+            - grapes_meso_3km
+            - grapes_meso_10km
+            - grapes_tym
+
+        production_type:
+            type of production, such as "grib2"
+        production_stream:
+            stream of production, such as "oper"
+        production_name:
+            name of production, such as "orig"
+        start_time:
+            start time of cycle
+        forecast_time:
+            forecast time for production
+        engine:
+            source engine
+        size:
+            messages count for one search request to ElasticSearch.
+
+        Returns
+        -------
+        typing.Iterable[ProductionEventMessage]
+            production event messages
+        """
+        if engine is None:
+            engine = nwpc_message_tool.source.production.nwpc_message.production
+
         query_body = engine.get_query_body(
             system=system,
             production_stream=production_stream,
@@ -90,14 +146,13 @@ class EsMessageStorage(MessageStorage):
             forecast_time=forecast_time,
         )
 
-        search_from = 0
-        total = np.iinfo(np.int16).max
         pbar = None
         scroll = "1m"
         scroll_id = None
 
         indexes = engine.get_index(start_time)
         indexes = set(indexes)
+
         for index in indexes:
             search_from = 0
             total = np.iinfo(np.int16).max
@@ -143,9 +198,55 @@ class EsMessageStorage(MessageStorage):
             ecflow_port: str = None,
             ecf_date: StartTimeType = None,
             index_ecf_date: StartTimeType = None,
-            engine = nwpc_message_tool.source.ecflow_client,
+            engine = None,
             size: int = 20,
     ) -> typing.Iterable[EcflowClientMessage]:
+        """
+        Get ecflow client command messages from ElasticSearch.
+
+        Examples
+        --------
+
+        >>> import pandas as pd
+        >>> from nwpc_message_tool import EsMessageStorage
+        >>> storage = EsMessageStorage(
+        ...    hosts=["localhost:9200"]
+        ... )
+        >>> results = storage.get_ecflow_client_messages(
+        ...     node_name="/globalchartos/00/deterministic/base/006/wmc_hgt_500_sep_006",
+        ...    ecflow_host="login_b01",
+        ...    ecflow_port="31071",
+        ...    ecf_date=pd.to_datetime("2021-04-01")
+        ... )
+        >>> len(list(results))
+        10
+
+        Parameters
+        ----------
+        node_name:
+            node path, variable ``ECF_NAME`` in ecFlow. such as "/grapes_meso_3km_v5_0/cold/00/model/fcst"
+        ecflow_host:
+            ecflow server host, such as "login_b01"
+        ecflow_port:
+            ecflow server port, such as "31071"
+        ecf_date:
+            search date
+        index_ecf_date:
+            index date, same as ``ecf_date`` in default.
+            Used when index is not generated from ``ECF_DATE``.
+        engine:
+            source engine:
+        size:
+             messages count for one search request to ElasticSearch.
+
+        Returns
+        -------
+        typing.Iterable[EcflowClientMessage]
+            ecflow client command messages.
+        """
+        if engine is None:
+            engine = nwpc_message_tool.source.ecflow_client
+
         if index_ecf_date is None:
             index_ecf_date = ecf_date
 
