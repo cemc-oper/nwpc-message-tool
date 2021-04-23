@@ -56,7 +56,7 @@ def get_query_body(
     conditions = [{
         "term": {"source": system}
     }]
-    if type(start_time) == datetime.datetime:
+    if isinstance(start_time, datetime.datetime):
         conditions.append({
             "term": {
                 "startTime": start_time.isoformat()
@@ -71,7 +71,7 @@ def get_query_body(
                 }
             }
         })
-    elif isinstance(start_time, typing.List):
+    elif isinstance(start_time, typing.List) or isinstance(start_time, pd.DatetimeIndex):
         conditions.append({
             "terms": {
                 "startTime": [s.isoformat() for s in start_time]
