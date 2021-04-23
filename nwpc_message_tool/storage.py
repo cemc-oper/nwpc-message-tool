@@ -358,6 +358,44 @@ class EsMessageStorage(MessageStorage):
             production_name: str = None,
             engine = nwpc_message_tool.source.production.nwpc_message.production_standard_time
     ) -> typing.Iterable[ProductionStandardTimeMessage]:
+        """
+        Get standard time message for production from ElasticSearch
+
+        Examples
+        --------
+
+        >>> import pandas as pd
+        >>> from nwpc_message_tool import EsMessageStorage
+        >>> storage = EsMessageStorage(
+        ...    hosts=["localhost:9200"]
+        ... )
+        >>> results = storage.get_production_standard_time_message(
+        ...     system="grapes_gfs_gmf",
+        ...     production_stream="oper",
+        ...     production_type="grib2",
+        ...     production_name="orig"
+        ... )
+        >>> next(results)
+        <nwpc_message_tool.message.production.ProductionStandardTimeMessage at 0x1c8a26fffd0>
+
+        Parameters
+        ----------
+        system:
+            system which generates the product, such as "grapes_gfs_gmf"
+        production_type:
+            type of production, such as "grib2"
+        production_stream:
+            stream of production, such as "oper"
+        production_name:
+            name of production, such as "orig"
+        engine:
+            source engine
+
+        Returns
+        -------
+        typing.Iterable[ProductionStandardTimeMessage]
+            production stardard time messages
+        """
         query_body = engine.get_query_body(
             system=system,
             production_stream=production_stream,
