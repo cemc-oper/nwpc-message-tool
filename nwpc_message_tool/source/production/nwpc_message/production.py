@@ -31,6 +31,20 @@ def load_message(doc: dict) -> ProductionEventMessage:
 def get_index(
         start_time: StartTimeType = None
 ) -> typing.List[str]:
+    """
+    Get index list for all start time.
+
+    **Important**: need use ``set()``.
+
+    Parameters
+    ----------
+    start_time:
+        start times
+    Returns
+    -------
+    typing.List[str]:
+        index list
+    """
     if isinstance(start_time, typing.Tuple):
         time_series = pd.date_range(
             start=pd.Timestamp(start_time[0]),
@@ -60,6 +74,7 @@ def get_query_body(
         conditions.append({"term": {"data.stream": production_stream}})
     if production_name is not None:
         conditions.append({"term": {"data.name": production_name}})
+
     if isinstance(start_time, datetime.datetime):
         conditions.append({"term": {"data.start_time": start_time.isoformat()}})
     elif isinstance(start_time, typing.Tuple):
@@ -71,7 +86,7 @@ def get_query_body(
                 }
             }
         })
-    elif isinstance(start_time, typing.List):
+    elif isinstance(start_time, typing.List) or isinstance(start_time, pd.DatetimeIndex):
         conditions.append({
             "terms": {
                 "data.start_time": [s.isoformat() for s in start_time]
