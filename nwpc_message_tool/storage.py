@@ -106,7 +106,7 @@ class EsMessageStorage(MessageStorage):
 
         Parameters
         ----------
-        system:
+        system :
             system which generates the product, such as
 
             - grapes_gfs_gmf
@@ -114,19 +114,24 @@ class EsMessageStorage(MessageStorage):
             - grapes_meso_10km
             - grapes_tym
 
-        production_type:
+        production_type :
             type of production, such as "grib2"
-        production_stream:
+        production_stream :
             stream of production, such as "oper"
-        production_name:
+        production_name :
             name of production, such as "orig"
-        start_time:
+        start_time :
             start time of cycle
-        forecast_time:
+
+            - ``TimeType1``: time point
+            - ``typing.Tuple[TimeType, TimeType]``: time range of [t1, t2]
+            - ``typing.List[TimeType]``: time list of [t1, t2, t3, .... tn]
+
+        forecast_time :
             forecast time for production
-        engine:
+        engine :
             source engine
-        size:
+        size :
             messages count for one search request to ElasticSearch.
 
         Returns
