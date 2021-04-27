@@ -18,7 +18,7 @@ class StandardTimeProcessor(object):
 
             [
                 {
-                    "start_hours": "00",
+                    "start_hour": "00",
                     "forecast_hours": [0, 1, 2, 3, ... ]
                 }
             ]
@@ -98,7 +98,7 @@ class StandardTimeProcessor(object):
         production_times = [
             {
                 "start_hour": self.start_hours[index]["start_hour"],
-                "times": df[["forecast_hour", "upper_duration", "lower_duration"]].to_dict(orient="record")
+                "times": df[["forecast_hour", "upper_duration", "lower_duration"]].to_dict("records")
             } for index, df in enumerate(prod_time_dfs)
         ]
 
