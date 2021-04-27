@@ -9,6 +9,9 @@ from nwpc_message_tool.message.event import (
 
 
 class ProductionEventMessage(EventMessage):
+    """
+    Message for production event.
+    """
     def __init__(
             self,
             system: str = None,
@@ -34,6 +37,13 @@ class ProductionEventMessage(EventMessage):
 
 
 class ProductionStandardTimeMessage(EventMessage):
+    """
+    Message of standard time for production.
+
+    Attributes
+    ----------
+    start_hour : typing.Dict
+    """
     def __init__(
             self,
             system: str = None,

@@ -6,6 +6,9 @@ from nwpc_message_tool.presenter.presenter import Presenter
 
 
 class PrintPresenter(Presenter):
+    """
+    A simple printer to print all columns to stdout.
+    """
     def __init__(self):
         super(PrintPresenter, self).__init__()
 

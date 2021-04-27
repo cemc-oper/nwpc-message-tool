@@ -6,6 +6,30 @@ from tqdm.auto import tqdm
 
 
 class StandardTimeProcessor(object):
+    """
+    Calculate standard time from production event message table using Bootstrap.
+
+    Attributes
+    ----------
+    start_hours : typing.List
+        start hour of each cycle with forecast hour list
+
+        .. code-block:: python
+
+            [
+                {
+                    "start_hours": "00",
+                    "forecast_hours": [0, 1, 2, 3, ... ]
+                }
+            ]
+
+    bootstrap_count: int
+        sampling times.
+    bootstrap_sample: int
+        number of samples per time.
+    quantile: float
+        confidence interval size
+    """
     def __init__(
             self,
             start_hours: typing.List,
@@ -14,22 +38,6 @@ class StandardTimeProcessor(object):
             quantile: float = 0.99,
             show_progress: bool = False,
     ):
-        """
-
-        Parameters
-        ----------
-        start_hours: typing.List
-            start hour of each cycle with forecast hour list
-            [
-                {
-                    "start_hours": "00",
-                    "forecast_hours": [0, 1, 2, 3, ... ]
-                }
-            ]
-        bootstrap_count: int
-        bootstrap_sample: int
-        quantile: float
-        """
         self.start_hours = start_hours
         self.bootstrap_count = bootstrap_count
         self.bootstrap_sample = bootstrap_sample

@@ -12,6 +12,21 @@ from .presenter import Presenter
 
 
 class StepGridPlotPresenter(Presenter):
+    """
+    Plot grid plot for each cycle with forecast step as column.
+
+    Attributes
+    ----------
+    system : str
+        system name which is shown in title.
+    output_type : typing.Tuple[str]
+        output types, supported types:
+
+        - ``file``: save to a file
+        - ``notebook``: shown in Jupyter Notebook
+    output_path :
+        output file path, used when ``file`` is in ``output_type``
+    """
     def __init__(
             self,
             system: str="",

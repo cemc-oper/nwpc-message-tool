@@ -6,6 +6,9 @@ from .event import EventMessage
 
 
 class EcflowClientMessage(EventMessage):
+    """
+    ecFlow client command message.
+    """
     def __init__(
             self,
             command: str = None,

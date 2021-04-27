@@ -8,6 +8,17 @@ from nwpc_message_tool.message import ProductionEventMessage
 
 
 class TableProcessor(object):
+    """
+    Convert ProductionEventMessage into a table.
+
+    Attributes
+    ----------
+    columns : typing.List
+        table columns
+    drop_duplicates : bool
+    keep_duplicates :
+        same as Pandas
+    """
     def __init__(
             self,
             columns: typing.Optional[typing.List[str]] = None,

@@ -14,6 +14,9 @@ class EventStatus(Enum):
 
 
 class EventMessage(object):
+    """
+    Base message for event.
+    """
     def __init__(
             self,
             message_type: str = None,
