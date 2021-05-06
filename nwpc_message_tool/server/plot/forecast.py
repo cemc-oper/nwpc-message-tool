@@ -1,18 +1,10 @@
-import datetime
-import typing
-
 import pandas as pd
-from bokeh.models import (
-    ColumnDataSource,
-    HoverTool,
-    DatetimeTickFormatter,
-    BoxAnnotation
-)
-from bokeh.plotting import figure, Figure
+from bokeh.plotting import Figure
 from flask import current_app
 
 from nwpc_message_tool.source.production import nwpc_message
 from nwpc_message_tool.processor import TableProcessor
+from nwpc_message_tool.presenter.plot import ForecastTimeLinePlotPresenter
 from nwpc_message_tool.storage import EsMessageStorage
 from nwpc_message_tool._type import StartTimeType
 
@@ -43,14 +35,8 @@ def get_forecast_time_line(
         start_time=start_time,
         engine=engine.production,
     )
-
     processor = TableProcessor()
     table = processor.process_messages(results)
-
-    table["time_str"] = table["time"].map(lambda x: x.isoformat())
-    table["clock"] = (table["time"] - table["start_time"]) + pd.Timedelta(hours=start_hour)
-    table["start_hour"] = table["start_time"].map(lambda x: x.hour)
-    source_table = table[table["start_hour"] == start_hour]
 
     standard_time_messages = list(client.get_production_standard_time_message(
         system=system,
@@ -59,7 +45,6 @@ def get_forecast_time_line(
         production_name="orig",
         engine=nwpc_message.production_standard_time,
     ))
-
     standard_time_message = standard_time_messages[0]
     standard_time_df = pd.DataFrame([
         {**time, "start_hour": i["start_hour"]}
@@ -67,74 +52,11 @@ def get_forecast_time_line(
         for time in i["times"]
     ])
 
-    standard_forecast_time = pd.to_timedelta(
-        standard_time_df[
-            (standard_time_df["forecast_hour"] == forecast_hour) &
-            (standard_time_df["start_hour"] == f"{start_hour:02}")
-        ]["upper_duration"]
-    ).item()
-
-    current_source = ColumnDataSource(source_table)
-
-    tools = "pan,wheel_zoom,box_zoom,reset,save"
-
-    hover_tool = HoverTool(
-        tooltips=[
-            ("start_time", "@time_str"),
-            ("clock", "@clock"),
-        ],
-        formatters={
-            "@start_time": "datetime",
-            "@clock": "datetime",
-        },
+    presenter = ForecastTimeLinePlotPresenter(
+        system=system,
+        start_hour=start_hour,
+        forecast_hour=forecast_hour,
+        output_type=None
     )
-
-    p = figure(
-        plot_width=1000,
-        plot_height=500,
-        x_axis_type="datetime",
-        title=f"Production time for {system} ({forecast_hour:03}h)",
-        tools=tools,
-    )
-
-    upper_box = BoxAnnotation(
-        top=standard_forecast_time + pd.Timedelta(hours=start_hour),
-        fill_alpha=0.1,
-        fill_color='green',
-    )
-    p.add_layout(upper_box)
-
-    p.add_tools(hover_tool)
-
-    p.xaxis.formatter = DatetimeTickFormatter(
-        minsec=['%Y-%m-%d'],
-        minutes=['%Y-%m-%d'],
-        hourmin=['%Y-%m-%d'],
-        hours=['%Y-%m-%d']
-    )
-
-    p.yaxis.formatter = DatetimeTickFormatter(
-        minsec=['%H:%M:%S'],
-        minutes=['%H:%M:%S'],
-        hourmin=['%H:%M:%S'],
-        hours=['%H:%M:%S'],
-        days=['%H:%M:%S'],
-    )
-
-    p.circle(
-        y="clock",
-        x="time",
-        source=current_source,
-        color="blue",
-    )
-
-    p.xaxis.axis_label = "Start Time"
-    p.yaxis.axis_label = "Clock (Hour)"
-
-    p.title.text_font_size = '16pt'
-    p.xaxis.axis_label_text_font_size = '14pt'
-    p.yaxis.axis_label_text_font_size = '14pt'
-    p.xaxis.major_label_text_font_size = "14pt"
-    p.yaxis.major_label_text_font_size = "14pt"
-
+    p = presenter.generate_plot(table, standard_time_df)
     return p

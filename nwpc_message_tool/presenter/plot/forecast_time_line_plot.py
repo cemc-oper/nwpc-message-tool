@@ -30,10 +30,11 @@ class ForecastTimeLinePlotPresenter(Presenter):
         self.forecast_hour = forecast_hour
         self.output_type = output_type
         self.output_path = output_path
-        if "file" in output_type:
-            output_file(self.output_path)
-        elif "notebook" in output_type:
-            output_notebook()
+        if output_type is not None:
+            if "file" in output_type:
+                output_file(self.output_path)
+            elif "notebook" in output_type:
+                output_notebook()
 
     def show(
             self,
