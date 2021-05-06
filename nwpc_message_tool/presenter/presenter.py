@@ -7,5 +7,5 @@ class Presenter(ABC):
         pass
 
     @abstractmethod
-    def show(self, df: pd.DataFrame):
+    def show(self, **kwargs):
         pass
