@@ -10,6 +10,7 @@ from tqdm.auto import tqdm
 import nwpc_message_tool.source.production.nwpc_message
 import nwpc_message_tool.source.ecflow_client
 from nwpc_message_tool._type import StartTimeType
+from nwpc_message_tool._config import load_config
 
 from nwpc_message_tool.message import (
     ProductionEventMessage,
@@ -429,3 +430,38 @@ class EsMessageStorage(MessageStorage):
             current_count = len(res["hits"]["hits"])
             for hit in res['hits']['hits']:
                 yield engine.load_message(hit["_source"])
+
+
+def get_es_message_storage(
+        storage_name: str=None,
+        config_file=None,
+        **kwargs
+) -> EsMessageStorage:
+    """
+    Get EsMessageStorage from config file.
+
+    Default config locates in ``${USER}/.config/nwpc-oper/nwpc-message-tool.yaml``
+
+    Parameters
+    ----------
+    storage_name :
+        storage name, kye in "storage".
+    config_file :
+        config file path
+    kwargs
+
+    Returns
+    -------
+    EsMessageStorage
+    """
+    config = load_config(config_file)
+    storage_map = config["storage"]
+    if storage_name is None:
+        storage_name = config["default_storage"]
+    storage_record = storage_map[storage_name]
+
+    hosts = storage_record["auth"]["hosts"]
+    return EsMessageStorage(
+        hosts=hosts,
+        **kwargs
+    )

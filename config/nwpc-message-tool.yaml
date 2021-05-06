@@ -1,0 +1,17 @@
+# Config file for nwpc-message-tool
+# Default location: ${USER}/.config/nwpc-oper/nwpc-message-tool.yaml
+
+default_storage: es-storage-1
+
+storage:
+  es-storage-1:
+    type: elasticsearch
+    auth:
+      hosts: 
+        - localhost:9200
+  
+  es-storage-2:
+    type: elasticsearch
+    auth:
+      hosts: 
+        - localhost:9200
