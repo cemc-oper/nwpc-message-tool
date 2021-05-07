@@ -4,11 +4,11 @@ import pathlib
 import pandas as pd
 import numpy as np
 from bokeh.io import output_file, output_notebook, show
-from bokeh.plotting import figure
+from bokeh.plotting import figure, Figure
 from bokeh.models import LinearColorMapper, HoverTool
 import colorcet as cc
 
-from .presenter import Presenter
+from nwpc_message_tool.presenter.presenter import Presenter
 
 
 class StepGridPlotPresenter(Presenter):
@@ -43,7 +43,11 @@ class StepGridPlotPresenter(Presenter):
             output_notebook()
 
     def show(self, table_data: pd.DataFrame):
-        table_data = self._append_column(table_data)
+        p = self.generate_plot(table_data)
+        show(p)
+
+    def generate_plot(self, table_data: pd.DataFrame) -> Figure:
+        table_data = self._process_table(table_data)
 
         forecast_hours = table_data.fh.unique().astype(int)
         forecast_hours.sort()
@@ -81,10 +85,9 @@ class StepGridPlotPresenter(Presenter):
                 ("time", "@time_string")
             ],
         ))
+        return p
 
-        show(p)
-
-    def _append_column(self, table_data: pd.DataFrame):
+    def _process_table(self, table_data: pd.DataFrame):
         table_data["fh"] = table_data.forecast_hour.astype(str)
         table_data["st"] = table_data.start_time.apply(lambda x: x.strftime("%Y%m%d%H"))
         table_data["clock"] = table_data.time - table_data.start_time

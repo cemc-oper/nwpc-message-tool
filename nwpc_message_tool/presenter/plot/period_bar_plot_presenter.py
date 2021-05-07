@@ -8,10 +8,10 @@ from bokeh.io import (
     show,
 )
 from bokeh.models import ColumnDataSource
-from bokeh.plotting import figure
+from bokeh.plotting import figure, Figure
 from bokeh.models.formatters import DatetimeTickFormatter
 
-from .presenter import Presenter
+from nwpc_message_tool.presenter.presenter import Presenter
 
 
 class PeriodBarPlotPresenter(Presenter):
@@ -49,7 +49,11 @@ class PeriodBarPlotPresenter(Presenter):
             self,
             table_data: pd.DataFrame
     ):
-        table_data = self._append_column(table_data)
+        p = self.generate_plot(table_data)
+        show(p)
+
+    def generate_plot(self, table_data: pd.DataFrame) -> Figure:
+        table_data = self._process_table(table_data)
         grouped = table_data["time_length"].groupby(table_data["st"])
         grouped_table = grouped.agg(["min", "max"])
 
@@ -77,10 +81,9 @@ class PeriodBarPlotPresenter(Presenter):
         )
 
         p.xaxis.axis_label = "Time Clock"
+        return p
 
-        show(p)
-
-    def _append_column(self, table_data: pd.DataFrame):
+    def _process_table(self, table_data: pd.DataFrame):
         table_data["st"] = table_data.start_time.apply(
             lambda x: x.strftime("%Y%m%d%H")
         )

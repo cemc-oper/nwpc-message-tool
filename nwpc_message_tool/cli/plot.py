@@ -4,7 +4,7 @@ from loguru import logger
 from nwpc_message_tool._util import get_engine
 from nwpc_message_tool.cli._util import parse_start_time
 from nwpc_message_tool.storage import EsMessageStorage
-from nwpc_message_tool.presenter import (
+from nwpc_message_tool.presenter.plot import (
     StepGridPlotPresenter,
     PeriodBarPlotPresenter,
 )
