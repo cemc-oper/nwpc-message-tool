@@ -46,11 +46,11 @@ class ForecastTimeLinePlotPresenter(Presenter):
 
     def generate_plot(
             self,
-            production_time_table,
-            production_standard_time_table
+            production_time_table: pd.DataFrame,
+            production_standard_time_table: pd.DataFrame
     ) -> Figure:
         source_table = self._process_time_table(production_time_table)
-        standard_forecast_time = self._get_standard_forecast_time(production_standard_time_table)
+        standard_forecast_time = self._get_standard_time(production_standard_time_table)
 
         p = self._get_figure(source_table, standard_forecast_time)
         return p
@@ -64,7 +64,7 @@ class ForecastTimeLinePlotPresenter(Presenter):
 
         return source_table
 
-    def _get_standard_forecast_time(self, df):
+    def _get_standard_time(self, df) -> pd.Timedelta:
         return pd.to_timedelta(
             df[
                 (df["forecast_hour"] == self.forecast_hour) &
@@ -72,8 +72,12 @@ class ForecastTimeLinePlotPresenter(Presenter):
                 ]["upper_duration"]
         ).item()
 
-    def _get_figure(self, source_table, standard_forecast_time) -> Figure:
-        current_source = ColumnDataSource(source_table)
+    def _get_figure(
+            self,
+            production_table: pd.DataFrame,
+            standard_time: pd.Timedelta
+    ) -> Figure:
+        production_source = ColumnDataSource(production_table)
 
         tools = "pan,wheel_zoom,box_zoom,reset,save"
         hover_tool = HoverTool(
@@ -96,7 +100,7 @@ class ForecastTimeLinePlotPresenter(Presenter):
         )
 
         upper_box = BoxAnnotation(
-            top=standard_forecast_time + pd.Timedelta(hours=self.start_hour),
+            top=standard_time + pd.Timedelta(hours=self.start_hour),
             fill_alpha=0.1,
             fill_color='green',
         )
@@ -122,7 +126,7 @@ class ForecastTimeLinePlotPresenter(Presenter):
         p.circle(
             y="clock",
             x="time",
-            source=current_source,
+            source=production_source,
             color="blue",
         )
 

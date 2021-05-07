@@ -44,11 +44,11 @@ class CycleTimeLinePlotPresenter(Presenter):
 
     def generate_plot(
             self,
-            production_time_table,
-            production_standard_time_table
+            production_time_table: pd.DataFrame,
+            production_standard_time_table: pd.DataFrame
     ) -> Figure:
         source_table = self._process_time_table(production_time_table)
-        standard_table = self._process_standard_forecast_time_table(production_standard_time_table)
+        standard_table = self._process_standard_time_table(production_standard_time_table)
 
         p = self._get_figure(source_table, standard_table)
         return p
@@ -57,16 +57,16 @@ class CycleTimeLinePlotPresenter(Presenter):
         df["time_str"] = df["time"].map(lambda x: x.isoformat())
         return df
 
-    def _process_standard_forecast_time_table(self, df):
-        current_standard = df[df["start_hour"] == f"{self.start_time.hour:02}"].copy()
-        current_standard["upper_time"] = current_standard["upper_duration"].map(lambda x: pd.Timedelta(x)) + self.start_time
-        current_standard["lower_time"] = current_standard["lower_duration"].map(lambda x: pd.Timedelta(x)) + self.start_time
-        current_standard["upper_time_str"] = current_standard["upper_time"].map(lambda x: x.isoformat())
-        current_standard["lower_time_str"] = current_standard["lower_time"].map(lambda x: x.isoformat())
-        return current_standard
+    def _process_standard_time_table(self, df):
+        standard_table = df[df["start_hour"] == f"{self.start_time.hour:02}"].copy()
+        standard_table["upper_time"] = standard_table["upper_duration"].map(lambda x: pd.Timedelta(x)) + self.start_time
+        standard_table["lower_time"] = standard_table["lower_duration"].map(lambda x: pd.Timedelta(x)) + self.start_time
+        standard_table["upper_time_str"] = standard_table["upper_time"].map(lambda x: x.isoformat())
+        standard_table["lower_time_str"] = standard_table["lower_time"].map(lambda x: x.isoformat())
+        return standard_table
 
-    def _get_figure(self, source_table, standard_table) -> Figure:
-        current_source = ColumnDataSource(source_table)
+    def _get_figure(self, production_table: pd.DataFrame, standard_table: pd.DataFrame) -> Figure:
+        production_source = ColumnDataSource(production_table)
         standard_source = ColumnDataSource(standard_table)
 
         tools = "pan,wheel_zoom,box_zoom,reset,save"
@@ -114,7 +114,7 @@ class CycleTimeLinePlotPresenter(Presenter):
         p.line(
             y="time",
             x="forecast_hour",
-            source=current_source,
+            source=production_source,
             color="blue",
         )
 
