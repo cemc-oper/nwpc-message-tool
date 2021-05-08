@@ -3,7 +3,7 @@ from loguru import logger
 
 from nwpc_message_tool._util import get_engine
 from nwpc_message_tool.cli._util import parse_start_time
-from nwpc_message_tool.storage import EsMessageStorage
+from nwpc_message_tool.storage import EsMessageStorage, get_es_message_storage
 from nwpc_message_tool.presenter import (
     PrintPresenter,
     TableStorePresenter,
@@ -12,7 +12,8 @@ from nwpc_message_tool.processor import TableProcessor
 
 
 @click.command("table")
-@click.option("--elastic-server", required=True, multiple=True, help="ElasticSearch servers")
+@click.option("--elastic-server", multiple=True, help="set ElasticSearch servers.")
+@click.option("--storage-name", help="Use storage which is set in config file. Default use ``default_storage`` key.")
 @click.option("--system", required=True, help="system, such as grapes_gfs_gmf, grapes_meso_3km and so on.")
 @click.option("--production-stream", default="oper", help="production stream, such as oper.")
 @click.option("--production-type", default="grib2", help="production type, such as grib.")
@@ -38,8 +39,10 @@ from nwpc_message_tool.processor import TableProcessor
     "--output-file",
     help="output file path",
 )
+@click.option("--config-file", default=None, help="config file path, default is ``${HOME}/.config/nwpc-oper/nwpc-message-tool.yaml``.")
 def table_cli(
         elastic_server,
+        storage_name,
         system,
         production_stream,
         production_type,
@@ -48,9 +51,12 @@ def table_cli(
         engine,
         output_type,
         output_file,
+        config_file,
 ):
     """
-    Show messages as a table or write them into text files with --output-type and --output-file options.
+    Show production messages for GRAPES operation systems as a table.
+
+    Support print into console or write into text files with --output-type and --output-file options.
     """
     start_time = parse_start_time(start_time)
 
@@ -61,9 +67,17 @@ def table_cli(
     logger.info(f"fix system name to: {system}")
 
     logger.info(f"searching...")
-    client = EsMessageStorage(
-        hosts=elastic_server,
-    )
+    if len(elastic_server) > 0:
+        client = EsMessageStorage(
+            hosts=elastic_server,
+            show_progress=True
+        )
+    else:
+        client = get_es_message_storage(
+            storage_name,
+            show_progress=True,
+        )
+
     results = client.get_production_messages(
         system=system,
         production_stream=production_stream,
