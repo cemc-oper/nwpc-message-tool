@@ -1,6 +1,5 @@
 import click
-from nwpc_message_tool.cli.table import table_cli
-from nwpc_message_tool.cli.plot import plot_cli
+from nwpc_message_tool.cli.production import production
 
 
 @click.group()
@@ -9,8 +8,7 @@ def cli():
 
 
 def main():
-    cli.add_command(table_cli, name="table")
-    cli.add_command(plot_cli, name="plot")
+    cli.add_command(production, name="production")
     cli()
 
 

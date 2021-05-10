@@ -13,7 +13,7 @@ Messages from different platforms may store in different ElasticSearch servers.
 
 ## Getting started
 
-Use `python -m nwpc-message-tool` to run command line tool.
+Use `python -m nwpc_message_tool` to run command line tool.
 
 ### Draw step_grid plot
 
@@ -22,7 +22,7 @@ Draw production grid plot by step (step_grid).
 Use NMC monitoring platform data to analytic 00 cycle of GRAPES GFS from March 11, 2020 to March 21, 2020.
 
 ```shell script
-python -m nwpc-message-tool plot \
+python -m nwpc_message_tool proudction plot \
     --engine=nmc_monitor \
     --elastic-server localhost:9200 \
     --system grapes_gfs_gmf \
@@ -41,7 +41,7 @@ Draw production period bar plot (period_bar).
 Use NWPC message platform data to analytic 00 cycle of GRAPES GFS from March 11, 2020 to March 21, 2020.
 
 ```shell script
-python -m nwpc-message-tool plot \
+python -m nwpc_message_tool production plot \
     --engine=nwpc_message \
     --elastic-server localhost:9200 \
     --system grapes_meso_3km \
@@ -58,7 +58,7 @@ Create a time table of for each step production, and write it into a json file.
 Use NMC monitoring platform data to analytic 18 cycle of GRAPES GFS from March 17, 2020 to March 21, 2020.
 
 ```shell script
-nwpc_message_tool table \
+python -m nwpc_message_tool production table \
     --engine=nmc_monitor \
     --elastic-server localhost:9200 \
     --system grapes_gfs_gmf \

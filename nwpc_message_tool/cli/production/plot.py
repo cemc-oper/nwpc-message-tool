@@ -4,15 +4,16 @@ from loguru import logger
 from nwpc_message_tool._util import get_engine
 from nwpc_message_tool.cli._util import parse_start_time
 from nwpc_message_tool.storage import EsMessageStorage, get_es_message_storage
-from nwpc_message_tool.presenter import (
-    PrintPresenter,
-    TableStorePresenter,
+from nwpc_message_tool.presenter.plot import (
+    StepGridPlotPresenter,
+    PeriodBarPlotPresenter,
 )
 from nwpc_message_tool.processor import TableProcessor
 
 
-@click.command("table")
-@click.option("--elastic-server", multiple=True, help="set ElasticSearch servers.")
+@click.command("plot")
+@click.option("--plot-type", default="step_grid", type=click.Choice(["step_grid", "period_bar"]), help="type of plot")
+@click.option("--elastic-server", multiple=True, help="ElasticSearch servers")
 @click.option("--storage-name", help="Use storage which is set in config file. Default use ``default_storage`` key.")
 @click.option("--system", required=True, help="system, such as grapes_gfs_gmf, grapes_meso_3km and so on.")
 @click.option("--production-stream", default="oper", help="production stream, such as oper.")
@@ -21,8 +22,16 @@ from nwpc_message_tool.processor import TableProcessor
 @click.option(
     "--start-time",
     required=True,
-    metavar="YYYYMMDDHH[/YYYYMMDDHH]",
-    help="start time, one date or a data range.")
+    metavar="YYYYMMDDHH[[/YYYYMMDDHH]|[,YYYYMMDDHH,...]]",
+    help="start time, one date, a data range or a list of data.")
+@click.option(
+    "--start-time-freq",
+    default="",
+    help="start time range frequency, such as `D` means one point per day. "
+         "If --start-time is YYYYMMDDHH/YYYYMMDDHH, "
+         "use this option to generate a data list. "
+         "See documentation of pandas.data_range for more detail."
+)
 @click.option(
     "--engine",
     default="nwpc_message",
@@ -31,16 +40,18 @@ from nwpc_message_tool.processor import TableProcessor
 )
 @click.option(
     "--output-type",
-    default="print",
-    type=click.Choice(["print", "json", "csv"]),
-    help="output type"
+    default="file",
+    type=click.Choice(["file"]),
+    help="output type, currently only file is supported. "
+         "Once the plot is done, a html file is writen to disk and is opened by default web browser."
 )
 @click.option(
     "--output-file",
     help="output file path",
 )
 @click.option("--config-file", default=None, help="config file path, default is ``${HOME}/.config/nwpc-oper/nwpc-message-tool.yaml``.")
-def table_cli(
+def plot_cli(
+        plot_type,
         elastic_server,
         storage_name,
         system,
@@ -48,17 +59,16 @@ def table_cli(
         production_type,
         production_name,
         start_time: str,
+        start_time_freq,
         engine,
         output_type,
         output_file,
         config_file,
 ):
     """
-    Show production messages for GRAPES operation systems as a table.
-
-    Support print into console or write into text files with --output-type and --output-file options.
+    Plot for production message.
     """
-    start_time = parse_start_time(start_time)
+    start_time = parse_start_time(start_time, start_time_freq)
 
     engine = get_engine(engine)
     logger.info(f"using search engine: {engine.__name__}")
@@ -90,15 +100,25 @@ def table_cli(
     processor = TableProcessor()
     table = processor.process_messages(results)
 
-    if output_type == "print":
-        presenter = PrintPresenter()
+    print(table)
+
+    if plot_type == "step_grid":
+        presenter = StepGridPlotPresenter(
+            system=system,
+            output_type=("file",),
+            output_path=output_file,
+        )
         presenter.show(table)
-    elif output_type in ["json", "csv"]:
-        presenter = TableStorePresenter(output_type=output_type, output_file=output_file)
+    elif plot_type == "period_bar":
+        presenter = PeriodBarPlotPresenter(
+            system=system,
+            output_type=("file",),
+            output_path=output_file,
+        )
         presenter.show(table)
     else:
-        raise ValueError(f"output type is not supported: {output_type}")
+        raise ValueError(f"plot type is not supported: {plot_type}")
 
 
 if __name__ == "__main__":
-    table_cli()
+    plot_cli()
